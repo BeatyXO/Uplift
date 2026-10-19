@@ -77,7 +77,7 @@ Git metadata is absent from this workspace (`git status` reports that this is no
 - `genvm-lint check contracts/Uplift.py --json`: passed using `GENVM_VERSION=v0.3.0-rc7`.
 - `genvm-lint typecheck contracts/Uplift.py --json`: passed with zero errors and warnings.
 - `npm test`: 21 passed; `npm run typecheck`: passed.
-- `npm audit --omit=dev`: 0 known vulnerabilities.
+- `npm audit --omit=dev`: the prior audit reported 0 known vulnerabilities. A rerun after adding the dev-only Playwright dependency failed because the npm advisory endpoint was unavailable; CI will repeat it.
 - `npm run build`: blocked locally because Windows reports `spawn EFTYPE` for the otherwise x64 esbuild executable. CI runs the build on Ubuntu.
 - Playwright Chromium desktop/mobile and wallet E2E were added to CI, with screenshots and traces saved as workflow artifacts. Local browser execution remains unverified until Linux CI completes.
 - StudioNet chain selection was observed as `studionet`, chain ID `61999`; no transaction was submitted. `deployments/studionet.json` remains intentionally `NOT_DEPLOYED`.
