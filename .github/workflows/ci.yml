@@ -1,0 +1,55 @@
+name: Uplift source and behavior
+on:
+  push:
+  pull_request:
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m py_compile contracts/Uplift.py
+      - name: Python shim tests (offline behavioral model)
+        run: python -m pytest -q tests
+      - name: GenLayer Direct Mode tests (real GenVM, external inputs stubbed)
+        run: python -m pytest -q direct_tests
+      - name: GenVM lint
+        run: genvm-lint check contracts/Uplift.py --json
+        env:
+          GENVM_VERSION: v0.3.0-rc7
+      - name: GenVM typecheck
+        run: genvm-lint typecheck contracts/Uplift.py --json
+        env:
+          GENVM_VERSION: v0.3.0-rc7
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --no-audit
+      - run: npm audit --omit=dev
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+        env:
+          CI: 'true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uplift-browser-evidence
+          path: |
+            web/test-results/
+            web/playwright-report/
+          if-no-files-found: ignore

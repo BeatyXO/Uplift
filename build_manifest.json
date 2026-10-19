@@ -1,0 +1,18 @@
+{
+  "project": "Uplift",
+  "network": "GenLayer StudioNet",
+  "chain_id": 61999,
+  "chain_hex": "0xf22f",
+  "verification": {
+    "python_shim_tests_passed": 49,
+    "node_tests_passed": 21,
+    "typescript_tsx_transpile": "pass",
+    "dependency_backed_frontend_build": "not_run",
+    "genvm_direct_mode": "not_run",
+    "studionet_deployed": false,
+    "payouts_on_chain_proven": false
+  },
+  "github_target": "https://github.com/BeatyXO/Uplift.git",
+  "github_pushed": false,
+  "handoff": "CODEX_HANDOFF.md"
+}

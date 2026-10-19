@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+.env
+.env.local
+web/node_modules/
+web/dist/
+coverage/
+web/test-results/
+web/playwright-report/
+web/node_modules/.cache/
+web/tsconfig.tsbuildinfo

@@ -1,0 +1,15 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "explorer": "https://explorer-studio.genlayer.com",
+  "deployment_status": "NOT_DEPLOYED",
+  "contract_address": null,
+  "deploy_tx_hash": null,
+  "source_sha256_lf": null,
+  "verified_finalization": false,
+  "verified_successful_execution": false,
+  "live_lifecycle_verified": false,
+  "parent_and_child_transfers_verified": false,
+  "comment": "Intentionally empty. Populate only from genuine observed network events."
+}
