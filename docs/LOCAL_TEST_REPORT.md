@@ -84,3 +84,11 @@ Git metadata is absent from this workspace (`git status` reports that this is no
 - HIGH-severity release blocker remains: a failed child external payment may strand funds after source withdrawal state changes, and no proven recovery method is implemented. Real-value use is **NO-GO** until protocol-supported recovery is proven and tested. No live site, contract address, or payout proof is claimed.
 
 The repository CI workflow separates shim tests from Direct Mode and runs GenVM checks, frontend tests, typecheck, build, audit, and Playwright evidence collection.
+
+## GitHub Actions completion — 19 October 2026
+
+Run [39330158930](https://github.com/BeatyXO/Uplift/actions/runs/39330158930) passed on Ubuntu. It ran the Python shim suite (49), GenLayer Direct Mode on GenVM `v0.3.0-rc7` (7), GenVM lint and typecheck, `npm ci`, `npm audit --omit=dev` (0 vulnerabilities), frontend tests (21), TypeScript typecheck, Vite production build, and Playwright Chromium desktop/mobile (6 checks). Browser screenshots, traces, and the HTML report are attached to that workflow run as `uplift-browser-evidence`.
+
+The first CI attempt identified two environment/test-fixture issues: Direct Mode's release asset name had changed, and headless browser clipboard permissions were unavailable. CI now caches the official pinned combined GenVM runner bundle under the loader's expected versioned cache name, and the browser fixture stubs clipboard methods while exercising the actual wallet menu. The successful rerun confirms these CI paths.
+
+The local Windows `npm run build` remains blocked by `spawn EFTYPE`; the same build succeeds in CI. A local npm audit retry could not reach the npm advisory endpoint, while the successful CI audit reported zero production vulnerabilities. No StudioNet transactions or deployments were made. Failed child external payments still lack a proven recovery mechanism, so real-value funding remains **NO-GO**.

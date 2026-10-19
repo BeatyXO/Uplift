@@ -6,7 +6,7 @@
 
 This is **not** DeliveryOS under another name. DeliveryOS adjudicates the acceptance of bilateral digital work. Uplift tracks *relative change against a frozen baseline*, pools capital across multiple donors, gives funders a bounded adversarial voice, uses weighted outcome classification, and computes exact conservation of pooled money. There is no buyer/provider delivery or job revision workflow.
 
-> **Release status — 19 Oct 2026:** 49 Python shim tests, 7 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using `v0.3.0-rc7`; `genlayer-js` 1.1.8 integration passes TypeScript typecheck and waits for `FINALIZED` with `FINISHED_WITH_RETURN`. A lockfile is committed; the last successful production dependency audit reported zero vulnerabilities. A later audit request failed because the npm advisory endpoint was unreachable. **NOT DEPLOYED.** The Windows environment refuses to spawn esbuild (`EFTYPE`), so the local production bundle and browser E2E remain unverified; CI runs these on Linux and uploads browser screenshots. Real StudioNet consensus and child transfer delivery remain unverified. A HIGH-severity external child payment recovery blocker means real-value use is NO-GO. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) for evidence.
+> **Release status — 19 Oct 2026:** 49 Python shim tests, 7 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using `v0.3.0-rc7`; `genlayer-js` 1.1.8 integration waits for `FINALIZED` with `FINISHED_WITH_RETURN`. GitHub Actions run [39330158930](https://github.com/BeatyXO/Uplift/actions/runs/39330158930) passed the full Ubuntu pipeline: audit, typecheck, production build, and six desktop/mobile Playwright checks with screenshots. The local Windows build still reports esbuild `EFTYPE`; CI verifies the bundle. **NOT DEPLOYED.** Real StudioNet consensus and child transfer delivery remain unverified. A HIGH-severity external child payment recovery blocker means real-value use is NO-GO. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) for evidence.
 
 ## Distinctive protocol mechanics
 
@@ -121,3 +121,4 @@ The CLI command is `genlayer network set studionet && genlayer network info && g
 ## Completion handoff
 
 See [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) for an exact, fail-closed list of external build, GenVM, StudioNet, browser, and deployment work. The zip contains all source files, not a simulated or screenshot-only UI. **No fake transactions or mock demo counts.** The GitHub repository is `https://github.com/BeatyXO/Uplift`. Current publication status and the verified commit SHA are recorded in the completion report after an authenticated push.
+
