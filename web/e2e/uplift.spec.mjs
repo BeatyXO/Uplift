@@ -50,9 +50,17 @@ test('375px mobile navigation opens the registry without horizontal overflow', a
   await screenshot(page, 'mobile-registry');
 });
 
-test('wallet opt-in restores with eth_accounts, copies address, and disconnects locally', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+test('wallet opt-in restores with eth_accounts, copies address, and disconnects locally', async ({ page }) => {
   await installWalletMock(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value) => localStorage.setItem('uplift.testClipboard', value),
+        readText: async () => localStorage.getItem('uplift.testClipboard') || '',
+      },
+    });
+  });
   await page.goto('/');
   await page.getByRole('button', { name: 'Connect wallet' }).click();
   const walletButton = page.locator('.wallet-button');

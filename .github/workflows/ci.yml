@@ -14,6 +14,11 @@ jobs:
       - run: python -m py_compile contracts/Uplift.py
       - name: Python shim tests (offline behavioral model)
         run: python -m pytest -q tests
+      - name: Cache pinned GenVM runtime bundle
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.cache/gltest-direct"
+          curl -fsSL https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-runners-all.tar.xz -o "$HOME/.cache/gltest-direct/genvm-universal-v0.3.0-rc7.tar.xz"
       - name: GenLayer Direct Mode tests (real GenVM, external inputs stubbed)
         run: python -m pytest -q direct_tests
       - name: GenVM lint
@@ -53,3 +58,4 @@ jobs:
             web/test-results/
             web/playwright-report/
           if-no-files-found: ignore
+

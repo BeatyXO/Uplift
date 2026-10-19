@@ -131,7 +131,7 @@ def test_direct_sender_auth_deadlines_and_funding_value():
             contract.contribute("impact_001")
 
 
-def test_direct_impact_consensus_conserves_pool_and_emits_ewm_messages():
+def test_direct_impact_consensus_conserves_pool_and_emits_evm_messages():
     with uplift_vm() as (vm, contract):
         baseline = evidence("Baseline records 120 students and 35% completion.", "baseline")
         claim = evidence("Independent registry shows completion rose from 35% to 59%.", "claim")
@@ -259,3 +259,4 @@ def test_direct_cancellation_and_review_timeout_refund_donors():
         assert json.loads(contract.get_program("impact_timeout"))["status"] == "TIMED_OUT"
         vm.sender = as_sender(DONOR_A)
         assert contract.withdraw_refund("impact_timeout") == 101
+

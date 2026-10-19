@@ -11,3 +11,4 @@ web/test-results/
 web/playwright-report/
 web/node_modules/.cache/
 web/tsconfig.tsbuildinfo
+.ci-evidence/
