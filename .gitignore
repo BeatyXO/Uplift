@@ -12,3 +12,4 @@ web/playwright-report/
 web/node_modules/.cache/
 web/tsconfig.tsbuildinfo
 .ci-evidence/
+.ci-evidence*/

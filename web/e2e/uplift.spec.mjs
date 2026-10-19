@@ -8,6 +8,13 @@ async function installWalletMock(page) {
     if (!window.localStorage.getItem('uplift.testWalletCounts')) {
       window.localStorage.setItem('uplift.testWalletCounts', JSON.stringify({ eth_accounts: 0, eth_requestAccounts: 0 }));
     }
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value) => window.localStorage.setItem('uplift.testClipboard', value),
+        readText: async () => window.localStorage.getItem('uplift.testClipboard') || '',
+      },
+    });
     window.ethereum = {
       request: async ({ method }) => {
         const current = JSON.parse(window.localStorage.getItem('uplift.testWalletCounts') || '{}');
@@ -52,15 +59,6 @@ test('375px mobile navigation opens the registry without horizontal overflow', a
 
 test('wallet opt-in restores with eth_accounts, copies address, and disconnects locally', async ({ page }) => {
   await installWalletMock(page);
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: {
-        writeText: async (value) => localStorage.setItem('uplift.testClipboard', value),
-        readText: async () => localStorage.getItem('uplift.testClipboard') || '',
-      },
-    });
-  });
   await page.goto('/');
   await page.getByRole('button', { name: 'Connect wallet' }).click();
   const walletButton = page.locator('.wallet-button');
@@ -72,10 +70,14 @@ test('wallet opt-in restores with eth_accounts, copies address, and disconnects 
   expect(restored.eth_accounts).toBeGreaterThan(0);
   await walletButton.click();
   await expect(page.getByRole('menu')).toContainText(wallet);
-  await page.getByRole('menuitem', { name: 'Copy address' }).click();
+  const copyAddress = page.getByRole('menuitem', { name: 'Copy address' });
+  await copyAddress.focus();
+  await page.keyboard.press('Enter');
   await expect(page.getByRole('menuitem', { name: 'Copied!' })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(wallet);
-  await page.getByRole('menuitem', { name: 'Disconnect' }).click();
+  const disconnect = page.getByRole('menuitem', { name: 'Disconnect' });
+  await disconnect.focus();
+  await page.keyboard.press('Enter');
   expect(await page.evaluate(() => localStorage.getItem('uplift.wallet.optin'))).toBeNull();
   const beforeReload = JSON.parse(await page.evaluate(() => localStorage.getItem('uplift.testWalletCounts')));
   await page.reload();
@@ -83,3 +85,6 @@ test('wallet opt-in restores with eth_accounts, copies address, and disconnects 
   const afterReload = JSON.parse(await page.evaluate(() => localStorage.getItem('uplift.testWalletCounts')));
   expect(afterReload.eth_requestAccounts).toBe(beforeReload.eth_requestAccounts);
 });
+
+
+
