@@ -1,5 +1,25 @@
 # Local verification report — October 19, 2026
 
+## Recovery implementation recheck — October 20, 2026
+
+The contract now overrides GenLayer's payable `__on_errored_message__` hook, stores returned payout value by recipient, and exposes recipient-only recovery withdrawal/read methods. Direct Mode explicitly simulates the callback context and verifies only the intended recipient can retry, the amount is cleared before the retry message, a repeated attempt is rejected, and callback re-entry restores the same wallet's amount. This is a state-logic test; `gltest` does not schedule a failing external child or prove StudioNet callback sender/value semantics.
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `python -m pytest -q tests` | PASS, 49 | Local shim only. |
+| `python -m pytest -q direct_tests` | PASS, 8 | GenVM Direct Mode `v0.3.0-rc7`; external evidence/LLM inputs remain fixtures; one test manually invokes callback logic. |
+| `GENVM_VERSION=v0.3.0-rc7 genvm-lint check contracts/Uplift.py --json` | PASS | Pinned SDK validation succeeded; reports a newer runner available, but verification used the repo-pinned runner. |
+| `GENVM_VERSION=v0.3.0-rc7 genvm-lint typecheck contracts/Uplift.py --json` | PASS | Zero errors, warnings or info diagnostics. |
+| `web/npm test` | PASS, 21 | Existing unit suites pass. |
+| `web/npm run typecheck` | PASS | TypeScript strict typecheck passes after adding recovery balance read/action. |
+| `web/npm run build` | FAILED locally | Windows `spawn EFTYPE` from esbuild while bundling Vite config. |
+| `web/npm ci --no-audit` | FAILED locally | npm exited with `Exit handler never called!`; it could not write logs to the restricted user npm cache. |
+| `web/npm run e2e` | BLOCKED locally | `playwright` executable absent because dependency installation did not complete. |
+| `genlayer network set studionet` + `genlayer network info` | PASS | CLI explicitly set to `studionet`, reports chain ID `61999`, RPC `https://studio.genlayer.com/api`. This confirms configuration only, not a live transaction. |
+| StudioNet failed-child callback lifecycle | NOT RUN | No approved Uplift signer selected; callback sender/value dispatch and actual recipient balance reconciliation remain unproven. |
+
+Release remains **NO-GO for deployment/value custody**. The active CLI account is an unrelated shared throwaway identity and was not used. `deployments/studionet.json` remains `NOT_DEPLOYED`. The previous successful Ubuntu CI run predates these recovery changes; push CI must verify the updated build and browser checks.
+
 ## Latest authoritative verification — October 20, 2026
 
 GitHub Actions run [39392657458](https://github.com/BeatyXO/Uplift/actions/runs/39392657458) passed on Ubuntu for commit `26325a2e537264688fd98d73e9b1f3b7600b8257`. It reports: Python shim 49 passed; GenLayer Direct Mode 7 passed on GenVM `v0.3.0-rc7`; GenVM lint and typecheck passed; `npm ci` and production dependency audit passed with 0 vulnerabilities; frontend tests 21 passed; TypeScript strict typecheck and Vite production build passed; and six Playwright Chromium desktop/mobile checks passed against the local Vite server. Browser screenshots and traces are workflow artifacts. This is CI/browser evidence, not live wallet or StudioNet evidence.

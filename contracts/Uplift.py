@@ -220,6 +220,7 @@ class Uplift(gl.Contract):
     programs: TreeMap[str, str]
     pledge: TreeMap[str, str]
     refunds: TreeMap[str, str]
+    recovered_payouts: TreeMap[str, str]
     disputes: TreeMap[str, str]
     program_ids: DynArray[str]
     program_count: u256
@@ -443,6 +444,35 @@ class Uplift(gl.Contract):
         _Recipient(Address(program["beneficiary"])).emit_transfer(value=u256(amount))
         return u256(amount)
 
+    @gl.public.write.payable
+    def __on_errored_message__(self) -> None:
+        """Restore failed external value transfers to their original recipient.
+
+        GenLayer invokes this hook for failed emitted messages that carried
+        value and refunds that value to this contract. The failed message's
+        sender address is the transfer recipient (see the SDK hook contract).
+        Keep this aggregate separate from program allocations: it is an
+        already-allocated entitlement whose delivery attempt failed.
+        """
+        failed_value = int(gl.message.value)
+        if failed_value <= 0:
+            raise _UserError("Failed transfer callback requires refunded value")
+        recipient = _address(gl.message.sender_address)
+        key = recipient
+        self.recovered_payouts[key] = str(int(self.recovered_payouts.get(key, "0")) + failed_value)
+
+    @gl.public.write
+    def withdraw_recovered_payout(self) -> u256:
+        """Retry only value returned by GenLayer's failed-message hook."""
+        recipient = _caller()
+        key = recipient
+        amount = int(self.recovered_payouts.get(key, "0"))
+        if amount <= 0:
+            raise _UserError("No recovered payout")
+        self.recovered_payouts[key] = "0"  # effects before async retry
+        _Recipient(Address(recipient)).emit_transfer(value=u256(amount))
+        return u256(amount)
+
     @gl.public.view
     def get_program(self, program_id: str) -> str:
         return self.programs.get(program_id, "")
@@ -453,6 +483,10 @@ class Uplift(gl.Contract):
         key = self._pledge_key(program_id, address)
         return _canon({"pledge_wei": self.pledge.get(key, "0"),
                        "refund_due_wei": self.refunds.get(key, "0")})
+
+    @gl.public.view
+    def get_recovered_payout(self, wallet: str) -> u256:
+        return u256(int(self.recovered_payouts.get(_address(wallet), "0")))
 
     @gl.public.view
     def get_count(self) -> u256:

@@ -175,6 +175,38 @@ def test_direct_impact_consensus_conserves_pool_and_emits_evm_messages():
         ] == [(BENEFICIARY, 100), (DONOR_A, 67), (DONOR_B, 136)]
 
 
+def test_direct_failed_value_callback_restores_only_recipient_and_retry_is_effects_first():
+    """Exercise the callback logic; Direct Mode does not schedule child failures."""
+    with uplift_vm() as (vm, contract):
+        # Model the failed child-message context: its recipient is the sender
+        # exposed to the source contract's payable error hook, and value is
+        # refunded to Uplift by the runtime.
+        vm.sender = as_sender(DONOR_A)
+        vm.value = 67
+        contract.__on_errored_message__()
+        vm.value = 0
+        assert contract.get_recovered_payout(DONOR_A) == 67
+        assert contract.get_recovered_payout(DONOR_B) == 0
+
+        messages = []
+        vm._gl_call_hook = lambda _vm, request: (messages.append(request), {"ok": None})[1]
+        vm.sender = as_sender(DONOR_B)
+        with vm.expect_revert("No recovered payout"):
+            contract.withdraw_recovered_payout()
+        vm.sender = as_sender(DONOR_A)
+        assert contract.withdraw_recovered_payout() == 67
+        assert contract.get_recovered_payout(DONOR_A) == 0
+        assert messages[-1]["EthSend"]["address"].as_hex == DONOR_A
+        assert messages[-1]["EthSend"]["value"] == 67
+
+        # A failed retry runs the same protocol hook and restores the balance.
+        vm.sender = as_sender(DONOR_A)
+        vm.value = 67
+        contract.__on_errored_message__()
+        vm.value = 0
+        assert contract.get_recovered_payout(DONOR_A) == 67
+
+
 def test_direct_expiry_and_timeout_are_permissionless_refund_paths():
     with uplift_vm() as (vm, contract):
         baseline = evidence("Baseline records 120 students and 35% completion.", "baseline")

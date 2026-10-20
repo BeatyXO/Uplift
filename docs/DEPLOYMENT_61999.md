@@ -7,6 +7,8 @@ Target: `studionet` stable hosted environment; **not** `studio-dev` chain 61997.
 - Node.js, Python 3.12+, GenLayer CLI and SDK versions compatible with stable StudioNet.
 - A connected **testnet** wallet with sufficient faucet GEN. Do not share keys or put signer secrets in the repo or frontend environment.
 - Actual contract tests in GenLayer Direct Mode and source static checks using `genvm-lint` (required for release).
+- A controlled StudioNet child-failure lifecycle proving `__on_errored_message__` receives the exact refunded amount and failed recipient, and that the recipient-only retry succeeds or safely recredits after another failure. Direct Mode invocation of the callback body is not this proof.
+- A trusted, explicitly selected local signer for the Uplift operator. Do not deploy with whichever account happens to be marked active in a shared CLI keychain.
 - An auditable deployment transaction log. **No address has been deployed by this project creator in this session.**
 
 ## 1. Local check
@@ -18,7 +20,7 @@ genvm-lint check contracts/Uplift.py --json
 genvm-lint typecheck contracts/Uplift.py --json
 ```
 
-The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. Add and pass those before deployment.
+The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. The recovery callback and retry state logic pass Direct Mode, but Direct Mode does not model protocol child failure or callback dispatch. Do not submit a deployment or funds until the required real callback lifecycle above is proven with the trusted signer.
 
 ## 2. Confirm exact chain identity
 

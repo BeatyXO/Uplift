@@ -6,7 +6,7 @@
 
 This is **not** DeliveryOS under another name. DeliveryOS adjudicates the acceptance of bilateral digital work. Uplift tracks *relative change against a frozen baseline*, pools capital across multiple donors, gives funders a bounded adversarial voice, uses weighted outcome classification, and computes exact conservation of pooled money. There is no buyer/provider delivery or job revision workflow.
 
-> **Release status — 20 Oct 2026:** 49 Python shim tests, 7 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using `v0.3.0-rc7`; `genlayer-js` 1.1.8 integration waits for `FINALIZED` with `FINISHED_WITH_RETURN`. GitHub Actions run [39392657458](https://github.com/BeatyXO/Uplift/actions/runs/39392657458) passed the Ubuntu pipeline: audit, typecheck, production build, and six desktop/mobile Playwright checks against the local Vite server with screenshots. The local Windows build still reports esbuild `EFTYPE`; CI verifies the bundle. **NOT DEPLOYED.** Real StudioNet transactions and child transfer delivery remain unverified. A HIGH-severity external child payment recovery blocker means real-value use is NO-GO. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) and the [financial settlement specification](docs/FINANCIAL_SETTLEMENT.md).
+> **Release status — 20 Oct 2026:** 49 Python shim tests, 8 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using the pinned `v0.3.0-rc7` runner; `genlayer-js` 1.1.8 integration waits for `FINALIZED` with `FINISHED_WITH_RETURN`. GitHub Actions run [39392657458](https://github.com/BeatyXO/Uplift/actions/runs/39392657458) passed the previous Ubuntu pipeline. The contract now overrides GenLayer's payable failed-message hook and the local test exercises restored-balance authorization and retry logic. **This does not prove StudioNet callback dispatch or recipient context.** Local `npm run typecheck` passes; the Windows Vite build fails with esbuild `EFTYPE`, and local Playwright dependencies could not be installed. **NOT DEPLOYED.** Live child payout/recovery remains unverified, so value custody and deployment are NO-GO until that controlled StudioNet test passes. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) and the [financial settlement specification](docs/FINANCIAL_SETTLEMENT.md).
 
 ## Distinctive protocol mechanics
 
@@ -56,7 +56,7 @@ web/src/protocol.ts           Shared schema, exact GEN parsing and validation
 tests/                        Local behavioral tests with explicit GenLayer shim`r`ndirect_tests/                GenLayer Direct Mode tests on the actual GenVM runtime
 docs/DELIVERYOS_AUDIT.md      Comparative architecture review and gaps
 docs/SECURITY.md              Threat model, custody risk and security limits
-docs/FINANCIAL_SETTLEMENT.md  Current custody accounting, asynchronous payouts and recovery blocker
+docs/FINANCIAL_SETTLEMENT.md  Custody accounting, asynchronous payouts, recovery hook and live verification gate
 docs/DEPLOYMENT_61999.md      Exact StudioNet network/deployment/runbook
 docs/DEMO_AND_SCORING.md      Reviewer flow, proof checklist and scoring targets
 deployments/studionet.json    Intentionally unpopulated live deployment manifest

@@ -44,4 +44,4 @@ Scope: `contracts/Uplift.py` and browser signing flows. This is author analysis,
 
 ## Go/no-go gate
 
-**NO-GO** for a public real-money pilot until: GenVM lint and typecheck pass; actual 61999 deploy and comprehensive consensus paths pass; payouts and refunds are shown received by EOAs with child finalization and balance deltas; wallet switch/rejection tested; UI build and mobile browser tests verified. This repo is presently a testnet research implementation.
+**NO-GO** for value custody and StudioNet deployment until: GenVM lint and typecheck pass on the pinned runner; the error callback is triggered by an actual failed value child with the expected recipient/value; retry success/failure and child finality are reconciled with EOA balance deltas; full assessment/challenge consensus paths pass; wallet switch/rejection are tested; and UI build/mobile browser checks pass. The contract now overrides GenLayer's documented `__on_errored_message__` hook and Direct Mode tests its state logic, but those tests do not prove callback dispatch by StudioNet. Keep `deployments/studionet.json` at `NOT_DEPLOYED` until that release gate passes.

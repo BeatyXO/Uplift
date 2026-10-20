@@ -9,7 +9,13 @@
     "typescript_strict_typecheck": "pass (GitHub Actions run 39392657458)",
     "dependency_backed_frontend_build": "pass (GitHub Actions run 39392657458)",
     "npm_audit_omit_dev": "pass, 0 vulnerabilities (GitHub Actions run 39392657458)",
-    "genvm_direct_mode": "pass, 7 tests (GenVM v0.3.0-rc7; GitHub Actions run 39392657458)",
+    "genvm_direct_mode": "pass, 8 tests (GenVM v0.3.0-rc7; local run 2026-10-20; recovery callback body manually invoked, protocol callback dispatch not simulated)",
+    "genvm_pinned_lint_typecheck": "pass (GENVM_VERSION=v0.3.0-rc7; local run 2026-10-20)",
+    "recovery_hook_implemented": true,
+    "recovery_callback_live_verified": false,
+    "local_web_typecheck": "pass (2026-10-20)",
+    "local_web_build": "blocked: Windows esbuild spawn EFTYPE (2026-10-20)",
+    "local_browser_e2e": "blocked: Playwright install failed in restricted npm cache (2026-10-20)",
     "genvm_lint_and_typecheck": "pass (GitHub Actions run 39392657458)",
     "playwright_chromium": "pass, 6 desktop/mobile checks on localhost Vite server (GitHub Actions run 39392657458)",
     "studionet_deployed": false,
@@ -19,6 +25,6 @@
   "github_pushed": true,
   "ci_verified_commit": "26325a2e537264688fd98d73e9b1f3b7600b8257",
   "verified_ci_run": "https://github.com/BeatyXO/Uplift/actions/runs/39392657458",
-  "release_decision": "NO-GO for real-value deployment until failed child transfer recovery can be implemented and verified",
+  "release_decision": "NO-GO for StudioNet deployment/value custody until callback dispatch, recipient context, failed retry, child finality, and recipient balance reconciliation are verified on-chain",
   "handoff": "CODEX_HANDOFF.md"
 }

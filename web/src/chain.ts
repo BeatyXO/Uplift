@@ -40,6 +40,10 @@ export async function fetchAccount(id:string,wallet:string):Promise<{pledge_wei:
   const data=await readClient.readContract({address,functionName:'get_account',args:[id,wallet]});
   return JSON.parse(String(data));
 }
+export async function fetchRecoveredPayout(wallet:string):Promise<string> {
+  const address=getContract() as `0x${string}`;
+  return String(await readClient.readContract({address,functionName:'get_recovered_payout',args:[wallet]}));
+}
 export async function connectWallet():Promise<string>{
   const provider=getWalletProvider();
   if(!provider) throw new Error('Install an EIP-1193 wallet to connect');
