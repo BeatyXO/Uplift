@@ -1,5 +1,31 @@
 # Local verification report — October 19, 2026
 
+## StudioNet contract-load fix and isolated deploy — October 20, 2026
+
+The first authorized test deployment finalized but did **not** execute successfully: transaction `0x4d273be8d2b050c76bc5a7a51e060ab4b95b28b386509dcd5d3315e9f64a5431` returned `contract_error: invalid_contract`, and the address had no registered contract schema. The runner metadata comment was contiguous with the next leading comment, which GenVM parsed as a single runner JSON block. `contracts/Uplift.py` now has the required blank line after `Depends`.
+
+The corrected source passed pinned `genvm-lint check` and `genvm-lint typecheck`. It was deployed on verified `studionet` (chain ID `61999`) using the authorized `coverageSealThrowaway` signer. Deployment transaction `0xa9d1915b3df2f4119ced9fff5274c775bb0571b8a98b397ebb5f18eaf05591ed` reached `FINALIZED`, result `MAJORITY_AGREE`; leader execution was `SUCCESS`, three validators agreed, and two were idle. Contract address: `0xd8173621f871740A5447c954701ACc2196b804Bb`. StudioNet schema retrieval succeeds and a fresh `get_count()` read returned `0`. Source SHA-256 after LF normalization: `5f05b9f29d198774edabee03ed18f82f72925b0638ac9f82f8ca155763cd7238`.
+
+This proves a test deployment can load and execute its initializer, not the payment recovery lifecycle. No failed-child lifecycle was attempted because the environment has no `forge`, `solc`, or `cast` tool to create a controlled reverting EVM recipient. A read of `get_recovered_payout` using the CLI's `0x` string argument was rejected as an invalid address argument; no write was made. The deployment manifest intentionally remains `NOT_DEPLOYED` until callback dispatch, recipient identity, value restoration, retry, child finality, and balance deltas are verified. Do not direct public funding to this test address.
+
+The initial failed deployment is recorded as an observed failure only; it is not the usable contract address.
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Pinned `genvm-lint check contracts/Uplift.py --json` | PASS | 3 lint checks; pinned runner `v0.3.0-rc7`. |
+| Pinned `genvm-lint typecheck contracts/Uplift.py --json` | PASS | Zero errors, warnings, or info diagnostics. |
+| `python -m pytest -q tests` | PASS, 49 | Shim tests; not live chain evidence. |
+| `python -m pytest -q direct_tests` | PASS, 8 | GenVM Direct Mode tests; callback body is simulated. |
+| `web/npm test` | PASS, 21 | Evidence and EIP-1193 wallet unit suites. |
+| `node web/node_modules/typescript/bin/tsc --noEmit` | PASS | Strict TypeScript check via local compiler binary. |
+| `web/npm run typecheck` / `web/npm run build` | BLOCKED | `tsc` Windows shim is missing in the current `node_modules`; direct compiler invocation passed and the Vite production build succeeded outside the workspace sandbox. |
+| Direct Vite production build | PASS | Vite built 2,033 modules. It emitted a non-fatal warning that the main minified chunk is 769.50 kB. |
+| `web/npm run e2e` | BLOCKED | Playwright executable missing because dependency installation did not complete. |
+| StudioNet deployment receipt | PASS, test-only | Finalized, successful leader execution, majority agreement. |
+| StudioNet contract schema and initial `get_count()` | PASS | Schema lists expected methods; count is zero. |
+| Failed-child recovery lifecycle | NOT VERIFIED | No reverting EVM test recipient/toolchain; high-severity public-custody blocker remains. |
+| `deployments/studionet.json` | `NOT_DEPLOYED` | Held per release gate until the complete live lifecycle passes. |
+
 ## Recovery implementation recheck — October 20, 2026
 
 The contract now overrides GenLayer's payable `__on_errored_message__` hook, stores returned payout value by recipient, and exposes recipient-only recovery withdrawal/read methods. Direct Mode explicitly simulates the callback context and verifies only the intended recipient can retry, the amount is cleared before the retry message, a repeated attempt is rejected, and callback re-entry restores the same wallet's amount. This is a state-logic test; `gltest` does not schedule a failing external child or prove StudioNet callback sender/value semantics.
