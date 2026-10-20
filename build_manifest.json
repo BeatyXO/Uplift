@@ -6,13 +6,19 @@
   "verification": {
     "python_shim_tests_passed": 49,
     "node_tests_passed": 21,
-    "typescript_tsx_transpile": "pass",
-    "dependency_backed_frontend_build": "not_run",
-    "genvm_direct_mode": "not_run",
+    "typescript_strict_typecheck": "pass (GitHub Actions run 39330499158)",
+    "dependency_backed_frontend_build": "pass (GitHub Actions run 39330499158)",
+    "npm_audit_omit_dev": "pass, 0 vulnerabilities (GitHub Actions run 39330499158)",
+    "genvm_direct_mode": "pass, 7 tests (GenVM v0.3.0-rc7; GitHub Actions run 39330499158)",
+    "genvm_lint_and_typecheck": "pass (GitHub Actions run 39330499158)",
+    "playwright_chromium": "pass, 6 desktop/mobile checks on localhost Vite server (GitHub Actions run 39330499158)",
     "studionet_deployed": false,
     "payouts_on_chain_proven": false
   },
   "github_target": "https://github.com/BeatyXO/Uplift.git",
-  "github_pushed": false,
+  "github_pushed": true,
+  "ci_verified_commit": "584df4a040031a783e6e1362265c5aba062e4399",
+  "verified_ci_run": "https://github.com/BeatyXO/Uplift/actions/runs/39330499158",
+  "release_decision": "NO-GO for real-value deployment until failed child transfer recovery can be implemented and verified",
   "handoff": "CODEX_HANDOFF.md"
 }

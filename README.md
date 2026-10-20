@@ -6,7 +6,7 @@
 
 This is **not** DeliveryOS under another name. DeliveryOS adjudicates the acceptance of bilateral digital work. Uplift tracks *relative change against a frozen baseline*, pools capital across multiple donors, gives funders a bounded adversarial voice, uses weighted outcome classification, and computes exact conservation of pooled money. There is no buyer/provider delivery or job revision workflow.
 
-> **Release status — 19 Oct 2026:** 49 Python shim tests, 7 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using `v0.3.0-rc7`; `genlayer-js` 1.1.8 integration waits for `FINALIZED` with `FINISHED_WITH_RETURN`. GitHub Actions run [39330158930](https://github.com/BeatyXO/Uplift/actions/runs/39330158930) passed the full Ubuntu pipeline: audit, typecheck, production build, and six desktop/mobile Playwright checks with screenshots. The local Windows build still reports esbuild `EFTYPE`; CI verifies the bundle. **NOT DEPLOYED.** Real StudioNet consensus and child transfer delivery remain unverified. A HIGH-severity external child payment recovery blocker means real-value use is NO-GO. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) for evidence.
+> **Release status — 20 Oct 2026:** 49 Python shim tests, 7 GenLayer Direct Mode tests, and 21 frontend unit tests pass. GenVM lint and typecheck pass using `v0.3.0-rc7`; `genlayer-js` 1.1.8 integration waits for `FINALIZED` with `FINISHED_WITH_RETURN`. GitHub Actions run [39330499158](https://github.com/BeatyXO/Uplift/actions/runs/39330499158) passed the Ubuntu pipeline: audit, typecheck, production build, and six desktop/mobile Playwright checks against the local Vite server with screenshots. The local Windows build still reports esbuild `EFTYPE`; CI verifies the bundle. **NOT DEPLOYED.** Real StudioNet transactions and child transfer delivery remain unverified. A HIGH-severity external child payment recovery blocker means real-value use is NO-GO. See [`docs/LOCAL_TEST_REPORT.md`](docs/LOCAL_TEST_REPORT.md) and the [financial settlement specification](docs/FINANCIAL_SETTLEMENT.md).
 
 ## Distinctive protocol mechanics
 
@@ -56,6 +56,7 @@ web/src/protocol.ts           Shared schema, exact GEN parsing and validation
 tests/                        Local behavioral tests with explicit GenLayer shim`r`ndirect_tests/                GenLayer Direct Mode tests on the actual GenVM runtime
 docs/DELIVERYOS_AUDIT.md      Comparative architecture review and gaps
 docs/SECURITY.md              Threat model, custody risk and security limits
+docs/FINANCIAL_SETTLEMENT.md  Current custody accounting, asynchronous payouts and recovery blocker
 docs/DEPLOYMENT_61999.md      Exact StudioNet network/deployment/runbook
 docs/DEMO_AND_SCORING.md      Reviewer flow, proof checklist and scoring targets
 deployments/studionet.json    Intentionally unpopulated live deployment manifest

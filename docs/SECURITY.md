@@ -22,7 +22,7 @@ Scope: `contracts/Uplift.py` and browser signing flows. This is author analysis,
 
 ## Open risks / important qualifications
 
-**1. Outgoing message liveness (HIGH):** GenLayer external value transfer messages execute after source finality. If a child transfer fails, its value is not automatically credited back to Uplift. The stored credit is already burned to prevent double withdrawal. There is no verified automatic repair or compensation path. Therefore a successful parent `withdraw_*` must never be presented as proof of successful delivery; the child transaction and balance movement must be checked. Treat this as a **release blocker** for any real-value deployment. The UI currently warns, but lacks child-tracking automation.
+**1. Outgoing message liveness (HIGH / P0):** GenLayer external value transfer messages execute after source finality. If a child transfer fails, its value is not automatically credited back to Uplift. The stored credit is already burned to prevent double withdrawal. No contract-verifiable callback/acknowledgement or safe retry/recovery path has been established. A successful parent `withdraw_*` is not proof of delivery; the child transaction and recipient balance movement must be checked. This is a **release blocker** for any real-value deployment. See [Financial settlement specification](FINANCIAL_SETTLEMENT.md). The UI does not yet automate child reconciliation.
 
 **2. False claims and weak causality (HIGH):** A timestamped and hashed document is not evidence of truth or causality. Consensus can faithfully agree on an inadequate standard or misleading report. Applications should require credible primary records, preferably third-party sources. Real human oversight is still advisable.
 
