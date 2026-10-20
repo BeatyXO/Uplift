@@ -7,7 +7,7 @@ Target: `studionet` stable hosted environment; **not** `studio-dev` chain 61997.
 - Node.js, Python 3.12+, GenLayer CLI and SDK versions compatible with stable StudioNet.
 - A connected **testnet** wallet with sufficient faucet GEN. Do not share keys or put signer secrets in the repo or frontend environment.
 - Actual contract tests in GenLayer Direct Mode and source static checks using `genvm-lint` (required for release).
-- A controlled StudioNet child-failure lifecycle proving `__on_errored_message__` receives the exact refunded amount and failed recipient, and that the recipient-only retry succeeds or safely recredits after another failure. Direct Mode invocation of the callback body is not this proof.
+- A controlled StudioNet test deployment using an explicitly trusted signer and isolated test funds. Use it only to verify `__on_errored_message__` receives the exact refunded amount and failed recipient, and that recipient-only retry succeeds or safely recredits after another failure. Direct Mode invocation of the callback body is not this proof.
 - A trusted, explicitly selected local signer for the Uplift operator. Do not deploy with whichever account happens to be marked active in a shared CLI keychain.
 - An auditable deployment transaction log. **No address has been deployed by this project creator in this session.**
 
@@ -20,7 +20,7 @@ genvm-lint check contracts/Uplift.py --json
 genvm-lint typecheck contracts/Uplift.py --json
 ```
 
-The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. The recovery callback and retry state logic pass Direct Mode, but Direct Mode does not model protocol child failure or callback dispatch. Do not submit a deployment or funds until the required real callback lifecycle above is proven with the trusted signer.
+The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. The recovery callback and retry state logic pass Direct Mode, but Direct Mode does not model protocol child failure or callback dispatch. A trusted signer may deploy an isolated test instance solely to run the recovery lifecycle below; do not market it or accept public contributions while callback semantics remain unverified. Keep `deployments/studionet.json` at `NOT_DEPLOYED` until the observed deployment and required checks are complete.
 
 ## 2. Confirm exact chain identity
 
@@ -39,15 +39,15 @@ RPC: https://studio.genlayer.com/api
 Explorer: https://explorer-studio.genlayer.com
 ```
 
-If RPC returns HTTP 403/502, stop. Do not claim any deploy or replay a write with uncertain submission status.
+If RPC returns HTTP 403/502, stop. Do not claim any deploy or replay a write with uncertain submission status. Use the trusted signer for the isolated test instance; a shared CLI throwaway account is not an acceptable substitute.
 
-## 3. Deploy single-contract Uplift
+## 3. Deploy an isolated test instance
 
 ```bash
 genlayer deploy --contract contracts/Uplift.py
 ```
 
-The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`, then enter the real address and source digest in `deployments/studionet.json`.
+The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Deploy with minimal test value and no public funding promotion. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`. Keep the release manifest `NOT_DEPLOYED` until the child-failure/recovery lifecycle and all release checks complete successfully.
 
 ## 4. Register an actual program
 

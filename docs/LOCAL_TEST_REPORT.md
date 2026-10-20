@@ -11,14 +11,16 @@ The contract now overrides GenLayer's payable `__on_errored_message__` hook, sto
 | `GENVM_VERSION=v0.3.0-rc7 genvm-lint check contracts/Uplift.py --json` | PASS | Pinned SDK validation succeeded; reports a newer runner available, but verification used the repo-pinned runner. |
 | `GENVM_VERSION=v0.3.0-rc7 genvm-lint typecheck contracts/Uplift.py --json` | PASS | Zero errors, warnings or info diagnostics. |
 | `web/npm test` | PASS, 21 | Existing unit suites pass. |
-| `web/npm run typecheck` | PASS | TypeScript strict typecheck passes after adding recovery balance read/action. |
+| `node node_modules/typescript/bin/tsc --noEmit` | PASS | Strict TypeScript check passed after adding recovery balance read/action. The interrupted local npm reinstall removed Windows command shims, so `npm run typecheck` could not resolve `tsc` afterward. |
 | `web/npm run build` | FAILED locally | Windows `spawn EFTYPE` from esbuild while bundling Vite config. |
 | `web/npm ci --no-audit` | FAILED locally | npm exited with `Exit handler never called!`; it could not write logs to the restricted user npm cache. |
 | `web/npm run e2e` | BLOCKED locally | `playwright` executable absent because dependency installation did not complete. |
 | `genlayer network set studionet` + `genlayer network info` | PASS | CLI explicitly set to `studionet`, reports chain ID `61999`, RPC `https://studio.genlayer.com/api`. This confirms configuration only, not a live transaction. |
 | StudioNet failed-child callback lifecycle | NOT RUN | No approved Uplift signer selected; callback sender/value dispatch and actual recipient balance reconciliation remain unproven. |
 
-Release remains **NO-GO for deployment/value custody**. The active CLI account is an unrelated shared throwaway identity and was not used. `deployments/studionet.json` remains `NOT_DEPLOYED`. The previous successful Ubuntu CI run predates these recovery changes; push CI must verify the updated build and browser checks.
+Public value custody remains **NO-GO** pending the real failed-child callback lifecycle. The next step is an isolated test deployment with minimal test funds and an explicitly trusted signer. The active CLI account is an unrelated shared throwaway identity and was not used; no chain write was submitted. `deployments/studionet.json` remains `NOT_DEPLOYED`.
+
+GitHub Actions run [39396688502](https://github.com/BeatyXO/Uplift/actions/runs/39396688502) then passed on commit `1708ae4d1e5b382793fb0f29fff57b650494cd20`, including the updated source: 49 shim tests, 8 Direct Mode tests, pinned GenVM lint/typecheck, `npm ci`, production dependency audit, 21 frontend tests, TypeScript typecheck, production build, and all Playwright desktop/mobile E2E. This CI run validates the updated browser bundle on the local Vite server, not real wallet or StudioNet child-message behavior.
 
 ## Latest authoritative verification — October 20, 2026
 
