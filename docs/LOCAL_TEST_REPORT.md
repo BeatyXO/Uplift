@@ -40,6 +40,8 @@ The account balances above are post-transfer reads. A pre-withdrawal balance sna
 
 This frontend verification ran on the local development server only. No Vercel deployment was performed. No edits were made to the contract, frontend, or deployment manifest during this resume pass; this report is the only source change from the test run.
 
+The pushed report commit `4e757e4c31544d051e7b42a8faec0d56ac2a10d0` passed GitHub Actions run [39601082288](https://github.com/BeatyXO/Uplift/actions/runs/39601082288): both web and contract jobs passed, including CI Playwright, GenLayer Direct Mode, pinned GenVM lint, and pinned GenVM typecheck. GitHub emitted non-failing deprecation notices for actions still targeting Node.js 20 and for the upcoming `ubuntu-latest` image migration.
+
 ## StudioNet contract-load fix and isolated deploy — October 20, 2026
 
 The first authorized test deployment finalized but did **not** execute successfully: transaction `0x4d273be8d2b050c76bc5a7a51e060ab4b95b28b386509dcd5d3315e9f64a5431` returned `contract_error: invalid_contract`, and the address had no registered contract schema. The runner metadata comment was contiguous with the next leading comment, which GenVM parsed as a single runner JSON block. `contracts/Uplift.py` now has the required blank line after `Depends`.
