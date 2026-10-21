@@ -9,7 +9,7 @@ Target: `studionet` stable hosted environment; **not** `studio-dev` chain 61997.
 - Actual contract tests in GenLayer Direct Mode and source static checks using `genvm-lint` (required for release).
 - A controlled StudioNet test deployment using an explicitly trusted signer and isolated test funds. Use it only to verify `__on_errored_message__` receives the exact refunded amount and failed recipient, and that recipient-only retry succeeds or safely recredits after another failure. Direct Mode invocation of the callback body is not this proof.
 - A trusted, explicitly selected local signer for the Uplift operator. Do not deploy with whichever account happens to be marked active in a shared CLI keychain.
-- An auditable deployment transaction log. **No address has been deployed by this project creator in this session.**
+- An auditable deployment transaction log. Test-only StudioNet deployments and successful assessment/payout cycles are recorded in [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md). They are not release-approved deployments.
 
 ## 1. Local check
 
@@ -47,7 +47,7 @@ If RPC returns HTTP 403/502, stop. Do not claim any deploy or replay a write wit
 genlayer deploy --contract contracts/Uplift.py
 ```
 
-The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Deploy with minimal test value and no public funding promotion. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`. Keep the release manifest `NOT_DEPLOYED` until the child-failure/recovery lifecycle and all release checks complete successfully.
+The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Deploy with minimal test value and no public funding promotion. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`. A test contract may be deployed and exercised before release; keep the release manifest `NOT_DEPLOYED` until the child-failure/recovery lifecycle and all release checks complete successfully. This manifest status means no release-approved deployment, not that test contracts do not exist.
 
 ## 4. Register an actual program
 
@@ -105,7 +105,7 @@ No fake values or `example` hashes may be passed off as deployment evidence.
 
 ## Frontend deployment gate
 
-- `web/.env.example` has an intentionally empty `VITE_UPLIFT_CONTRACT_ADDRESS`; fill it with **only** a verified StudioNet deployment.
+- `web/.env.example` has an intentionally empty `VITE_UPLIFT_CONTRACT_ADDRESS`. For a Vercel testnet Preview, use the isolated fixture address documented in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md); it is not production-approved.
 - Source supports `0xf22f` injected wallet switching and previously authorized account restoration. Confirm behavior against real extension (including chain-change events) before launch.
 - Require passing dependency-backed `npm run typecheck`, `npm run build`, `npm test` and real browser smoke. Network-restricted build environment here could only run Node tests and TS transpilation.
 - Never label a payout received merely because the source chain transaction is finalized. Validate child transfer.

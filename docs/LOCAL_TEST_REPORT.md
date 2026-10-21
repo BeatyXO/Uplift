@@ -1,5 +1,7 @@
 # Local verification report — October 19, 2026
 
+Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
+
 ## StudioNet assessment and local frontend resume — October 21, 2026
 
 The already deployed test-only contract was left with its original 24-hour review deadline; it was not shortened or bypassed. On StudioNet chain `61999`, program `uplift_cycle_20261020c` at `0xd8173621f871740A5447c954701ACc2196b804Bb` reached its challenge deadline at `2026-10-21 11:09:04 UTC` (`12:09:04` Africa/Lagos). A fresh read after the deadline showed it remained in `REVIEW` until assessment was explicitly submitted.
