@@ -183,6 +183,40 @@ Git metadata is absent from this workspace (`git status` reports that this is no
 
 The repository CI workflow separates shim tests from Direct Mode and runs GenVM checks, frontend tests, typecheck, build, audit, and Playwright evidence collection.
 
+## StudioNet assessment follow-up — 21 October 2026
+
+This follow-up documents the requested recovery status and the attempt to run full- and partial-earning assessments with the authorized test wallets. The callback behavior remains unverified on StudioNet: no failed child transfer has been induced, and the callback's sender/value semantics have not been observed. Keep public-value funding blocked until that exact lifecycle is proven. The design and recovery limits are documented in `docs/FINANCIAL_SETTLEMENT.md`.
+
+The previously completed program `uplift_cycle_20261020c` on contract `0xd8173621f871740A5447c954701ACc2196b804Bb` remains `SETTLED` with status `UNPROVEN`, `earned_bps = 0`, and `beneficiary_due_wei = 0`. A live `get_count` returned 2 and `get_ids(0, 25)` returned only `uplift_cycle_20261020c` and `uplift_refund_20261020`; both are already settled. The existing deployed source uses a 24-hour challenge window, so neither can produce a new earning assessment.
+
+To avoid waiting 24 hours, an isolated test fixture changed only `CHALLENGE_SECONDS` to 60. It passed Python compilation and the pinned GenVM lint/typecheck. Three StudioNet deployment transactions finalized, but each leader receipt reported `execution_result = ERROR`; each returned address was absent from `gen_call`, so none is treated as deployed:
+
+| Deployment transaction | Returned address | Observed result |
+| --- | --- | --- |
+| `0x6dd98c94736d7ab28fa2a4ed8f68ebbfe674f72be8266208a38bbc0a1bcd803d` | `0x682C6E424006730E66a274AA04669c811B98754F` | Finalized; leader execution error; address not found |
+| `0x0b45c5e0ca1a26164472b7dc7e5684bd27bae82d8c182c62adc235926eaae55b` | `0xEb18Cc74b78ffF702AC6bf776097c3be00b1092B` | Finalized; leader execution error; address not found |
+| `0x697f1e2834a2b96bce7663b34324edcc6fe4dc38a2c522f79c5429f7b0fd3b9c` | `0x00da7d75c1315C89B49F62469a701957efEe9e48` | Finalized; leader execution error; address not found |
+
+StudioNet's `gen_dbg_traceTransaction` endpoint returned `Method not found`, and the three failed receipts exposed empty GenVM stdout/stderr and no raw error. A fourth deployment used a byte-preserving fixture where the only source change was `CHALLENGE_SECONDS = 60`:
+
+| Deployment transaction | Test contract | Observed result |
+| --- | --- | --- |
+| `0xd2562923b9c51e2e2e3e9ad2a24e44536fd33c46e681461eceb85abb5a44a539` | `0x2C64F7BF0A156b03B250321CD893E3bb2188308A` | `FINALIZED`, leader `SUCCESS`, `MAJORITY_AGREE`; `get_count` returned 0 |
+
+The fourth address is a callable test-only deployment. It has no programs yet. The fixture is retained at `tests/fixtures/UpliftFastTest.py`, with SHA-256 `A9784B48D208A655A0B1A379BF855AAB13F2D758D5AD762C8AA912EE036CD71A`; it is not a production contract. The three failed addresses have no programs and were not funded.
+
+No program was created, funded, assessed, or withdrawn on the working test contract. The CLI `write` action hard-codes `value = 0`, so it cannot submit the payable `contribute` call. A custom in-memory signer check was rejected by automatic review because it would access the CLI OS keychain for signing; no key material was revealed. Do not work around that rejection. Use a separately approved signing path before making payable test transactions.
+
+Wallet balance capture (StudioNet RPC, before the attempted assessment lifecycle / after all four deployment attempts):
+
+| Test wallet | Address | Before | After |
+| --- | --- | ---: | ---: |
+| Sponsor `coverageSealThrowaway` | `0xd6423ae82a975d55c6ceac222827a727325e0459` | 962.110216999999999978 GEN | 962.110216999999999978 GEN |
+| Tenant 1 | `0x5516488131150ccbe76341e5abd472013ecaa666` | 0.1 GEN | 0.1 GEN |
+| Tenant 2 | `0x4dcd388daacc30a6a427b92c6001cd31a2eb2576` | 0.1 GEN | 0.1 GEN |
+
+No live full- or partial-earning result or withdrawal balance delta was produced in this attempt. Do not infer a payout from these unchanged balances. The next step is to approve an appropriate local signing path for minimal test contributions, then run the two short-window assessments and capture each recipient balance immediately before and after its finalized child transfer. `deployments/studionet.json` remains `NOT_DEPLOYED`.
+
 ## GitHub Actions completion — 19 October 2026
 
 Run [39330158930](https://github.com/BeatyXO/Uplift/actions/runs/39330158930) passed on Ubuntu. It ran the Python shim suite (49), GenLayer Direct Mode on GenVM `v0.3.0-rc7` (7), GenVM lint and typecheck, `npm ci`, `npm audit --omit=dev` (0 vulnerabilities), frontend tests (21), TypeScript typecheck, Vite production build, and Playwright Chromium desktop/mobile (6 checks). Browser screenshots, traces, and the HTML report are attached to that workflow run as `uplift-browser-evidence`.
