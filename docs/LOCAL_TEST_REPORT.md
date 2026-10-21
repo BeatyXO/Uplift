@@ -1,6 +1,6 @@
 # Local verification report — October 19, 2026
 
-Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
+The live failed-child recovery gate and required evidence are documented in [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
 
 ## StudioNet assessment and local frontend resume — October 21, 2026
 
