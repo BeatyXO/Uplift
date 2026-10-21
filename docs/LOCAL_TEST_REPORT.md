@@ -40,6 +40,28 @@ The account balances above are post-transfer reads. A pre-withdrawal balance sna
 
 This frontend verification ran on the local development server only. No Vercel deployment was performed. No edits were made to the contract, frontend, or deployment manifest during this resume pass; this report is the only source change from the test run.
 
+## Live full- and partial-earning assessments — October 21, 2026
+
+Two test-only source-evidence programs were run on StudioNet chain `61999`, fast-window contract `0x2C64F7BF0A156b03B250321CD893E3bb2188308A`. This contract uses the isolated fixture with a 60-second challenge window; it is not the production deployment. Both assessments ask only whether pinned Uplift source evidence establishes a recovery implementation. They do not claim real-world impact or prove that StudioNet dispatches the failed-child callback. Pinned evidence is at commit `90f90f0d53a7b2af525062ad85eb41d6466a9688`: baseline `recovery-baseline.md` (471 bytes, SHA-256 `2c8f4747dca2dfabe9e8385cd87eb7848269da3586e088115f96b8e6e557f6d6`) and implementation `recovery-implementation.md` (1,210 bytes, SHA-256 `d12a27db18a36cd9bc1d10dcf1cd525502f7f400704d5f35c09f6fa15455f490`). Both raw GitHub responses were fetched and checked before submitting claims.
+
+Each program received `0.005 GEN` from Tenant 2, for `0.01 GEN` total. Tenant 1 was beneficiary. All listed parent writes finalized with majority agreement; no validator disagreement was recorded. Some transactions had two idle validators. The full create and full assessment receipt data each included both a successful and an error entry in the leader-receipt array; the transaction finalized with majority agreement and the on-chain program stored the result shown below.
+
+| Program | Assessment transaction | Stored result | Allocation |
+| --- | --- | --- | --- |
+| `uplift_full_1792601730320` | `0xe25290a56891350f8a3641b47e97c6dd8c62d6fb18faa9df03b736ddbdb0a882` | `SETTLED`, `[PROVEN]`, 10,000 bps | `0.005 GEN` award; zero refund |
+| `uplift_partial_1792601730321` | `0x14299cf61f695a65dc68a4f750383d8bcb8be28f4a5c4b8a32cf248ecb353e05` | `SETTLED`, `[PROVEN, UNPROVEN]`, 5,000 bps | `0.0025 GEN` award; `0.0025 GEN` refund |
+
+| Program | Create | Contribution | Claim |
+| --- | --- | --- | --- |
+| Full | `0xb054998d7280b5ad600e3325eec9fcd96157ad3db239b99986b5dfd71cc643bb` | `0x7e441458398f26b06c260b34bdd63cd5226f561aa38a6f6af2642485a5496e57` | `0x4ad4a02f16c7749b44494094bd12ab64b5d9029a3fb0e63ecebcec5ca3212830` |
+| Partial | `0xd11f68901b57c66265bd915fe85d62f8b0164c7a4443c4fa9f5b776e954af8fd` | `0xb929a1048668da2dc2a177d9ba1b964423b928f80a788a627193b30ea43f3b9b` | `0xfc13eedf82475d22c61620466ee0e640152c0e82a1242f0d2522881c332f1a80` |
+
+The full award withdrawal parent `0xec2aa0e78965632faeca3e0c7e8a6796dee915bbdc4d850c108d2ea5922da19b` triggered child `0x883728f1c98f1ab3b91dffefbec3b723a2a32b4b0fe53abe12e754e93dba754d`, finalized from the test contract to Tenant 1 for `0.005 GEN`. Tenant 1's pre-run snapshot was `0.1 GEN`; after the child transfer it was `0.105 GEN` (change `+0.005 GEN`).
+
+The partial award parent `0xcebea580917728d742fca9ef72257ba02fd092d0128d8ef555695707123ed5c3` triggered finalized child `0x03f62e5ab26a1a054a3134f6dc1ea2205ecb2cb5b0bb2e88bdce3b2d788aae44` to Tenant 1 for `0.0025 GEN`. The immediately captured balance changed from `0.105` to `0.1075 GEN` (`+0.0025 GEN`). The partial refund parent `0x1ac4cef226f6923bb9993dce144f9e0e35e989b29eef8ef46ff626ed1e41e6c3` triggered finalized child `0xc9619897f9741c35870629594c56991a3c462ddc298e99ea4d149fd9a60e76ec` to Tenant 2 for `0.0025 GEN`. Tenant 2's immediately captured balance changed from `0.09` to `0.0925 GEN` (`+0.0025 GEN`); its pre-run balance was `0.1 GEN` before the two `0.005 GEN` contributions. Fresh reads show both programs' award/refund entitlements are zero and both wallets' recovered-payout ledger entries are zero.
+
+These successful child transfers verify full/partial source-evidence allocation and recipient balance deltas on this test deployment. No child payment was deliberately failed, and no callback/retry was exercised. The failed-child recovery risk remains unverified on StudioNet; public-value funding remains **NO-GO** and `deployments/studionet.json` remains `NOT_DEPLOYED`. Two earlier empty setup records were left unfunded after their short funding window elapsed; they contain zero pool and no donor liabilities.
+
 The pushed report commit `4e757e4c31544d051e7b42a8faec0d56ac2a10d0` passed GitHub Actions run [39601082288](https://github.com/BeatyXO/Uplift/actions/runs/39601082288): both web and contract jobs passed, including CI Playwright, GenLayer Direct Mode, pinned GenVM lint, and pinned GenVM typecheck. GitHub emitted non-failing deprecation notices for actions still targeting Node.js 20 and for the upcoming `ubuntu-latest` image migration.
 
 ## StudioNet contract-load fix and isolated deploy — October 20, 2026
