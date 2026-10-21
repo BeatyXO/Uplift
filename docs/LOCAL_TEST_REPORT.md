@@ -1,5 +1,45 @@
 # Local verification report — October 19, 2026
 
+## StudioNet assessment and local frontend resume — October 21, 2026
+
+The already deployed test-only contract was left with its original 24-hour review deadline; it was not shortened or bypassed. On StudioNet chain `61999`, program `uplift_cycle_20261020c` at `0xd8173621f871740A5447c954701ACc2196b804Bb` reached its challenge deadline at `2026-10-21 11:09:04 UTC` (`12:09:04` Africa/Lagos). A fresh read after the deadline showed it remained in `REVIEW` until assessment was explicitly submitted.
+
+The permissionless assessment was submitted by the designated Tenant 1 test wallet and finalized:
+
+| Evidence | Observed value |
+| --- | --- |
+| Assessment transaction | `0xc4b242e209175c9dc7267a1d22e86f8551d2162602cfc3cdf9c5ec9f8df34900` |
+| Finality / consensus | `FINALIZED`, `MAJORITY_AGREE`; leader execution `SUCCESS`; 3 agree, 1 disagree, 1 idle |
+| Stored program result | `SETTLED`, `UNPROVEN`, `earned_bps = 0` |
+| Exact accounting | Pool `100000000000000000` wei; refundable `100000000000000000` wei; beneficiary award `0` |
+| Assessment basis | Only project documentation was supplied, not primary measurements of real-world impact; `UNPROVEN` is the expected fail-closed result |
+
+Both donors then withdrew their exact `0.05 GEN` refunds. Each parent transaction finalized with `MAJORITY_AGREE`, and each emitted a child transfer finalized to the matching donor address. Fresh `get_account` reads show each refund entitlement is now zero.
+
+| Donor | Parent withdrawal | Child transfer | Child receipt | Current observed account balance |
+| --- | --- | --- | --- | --- |
+| Tenant 2 `0x4dcd388daacc30a6a427b92c6001cd31a2eb2576` | `0xfc76868b93c4c63e2190f9d27de8364b0bf9d502aceb209d5b36c0a8a388b8c5` | `0x13b0d9fb039b5e2be9f74d1513e0f0e8aa758aad9919711070af8dbe61146013` | `FINALIZED`, from contract to Tenant 2, `50000000000000000` wei, triggered on parent finalization | `0.1 GEN` |
+| Sponsor throwaway `0xd6423ae82a975d55c6ceac222827a727325e0459` | `0x7bea7e6b49402b0d2e27b0a1e6908ab080c3b657c99cfc9a72974b86e8031489` | `0xd1aa9ef78a79716eef7de048c3fb3835f456e1feb45207c42ca6e50b8f39f981` | `FINALIZED`, from contract to sponsor, `50000000000000000` wei, triggered on parent finalization | `962.110256999999999978 GEN` |
+
+The account balances above are post-transfer reads. A pre-withdrawal balance snapshot for this assessment run was not captured, so no balance delta is claimed. This successful-transfer lifecycle does not test what StudioNet does when a child payment fails, whether the callback fires with the correct identity/value, or whether recovery is safe. The HIGH release blocker remains and `deployments/studionet.json` stays `NOT_DEPLOYED`.
+
+### Local verification on October 21
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `python -m pytest -q tests` | PASS, 49 | Shim suite; not chain execution proof. |
+| `python -m pytest -q direct_tests` | PASS, 8 | GenVM Direct Mode; external evidence/LLM inputs are fixtures. One warning: pytest cache path access was denied. |
+| Pinned GenVM lint | PASS, 3 | Uses runner `v0.3.0-rc7`; a newer runner notice is informational. |
+| Pinned GenVM typecheck | PASS | Zero errors, warnings, or info diagnostics. |
+| `npm ci --no-audit --fund=false` | PASS | Locked dependencies installed. |
+| `npm test` | PASS, 21 | Frontend unit tests. |
+| `npm run typecheck` | PASS | Local TypeScript compiler. |
+| `npm run build` | PASS | Vite built 2,033 modules. Main JS chunk is 769.50 kB minified and triggers a non-fatal size warning. |
+| `npm run e2e` | PASS, 6 | Local Vite server, desktop and 375px mobile. First cold run timed out on the initial dashboard load; the warmed rerun passed all cases. |
+| `npm audit --omit=dev` | PASS | 0 known vulnerabilities. |
+
+This frontend verification ran on the local development server only. No Vercel deployment was performed. No edits were made to the contract, frontend, or deployment manifest during this resume pass; this report is the only source change from the test run.
+
 ## StudioNet contract-load fix and isolated deploy — October 20, 2026
 
 The first authorized test deployment finalized but did **not** execute successfully: transaction `0x4d273be8d2b050c76bc5a7a51e060ab4b95b28b386509dcd5d3315e9f64a5431` returned `contract_error: invalid_contract`, and the address had no registered contract schema. The runner metadata comment was contiguous with the next leading comment, which GenVM parsed as a single runner JSON block. `contracts/Uplift.py` now has the required blank line after `Depends`.
