@@ -26,10 +26,13 @@ This remains a public-funding release gate. It is not represented as a completed
 - Playwright desktop/mobile E2E — 6 passed on the warm rerun.
 - `npm audit --omit=dev` — zero vulnerabilities.
 
-These are local/source verification results. They do not replace the still-pending live failed-child test or a hosted wallet lifecycle.
+These are local/source verification results. They do not replace the still-pending live failed-child test. The hosted real-wallet contribution/cancellation/refund lifecycle was completed on October 24, 2026 and is recorded with transaction IDs and balance reads in [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md).
 
 ## Suggested steward resubmission note
 
 We addressed the counterevidence admission issue. A challenge is now admitted only after the leader and validators retrieve matching bytes and verify the declared size and SHA-256. Invalid or unavailable submissions do not consume a challenge slot; verified text is retained and integrity-checked during assessment so a later source outage cannot block settlement. Regression coverage includes incorrect digests, incorrect sizes, unavailable sources, validator disagreement, minimal-contribution donors, and post-admission source outage in both Python tests and GenLayer Direct Mode.
 
 The live StudioNet failed-child callback and retry procedure is still unverified. We have kept it explicitly identified as a public-funding release gate and have not claimed live-chain proof. The current resubmission addresses the counterevidence finding without misrepresenting that separate live recovery test as complete.
+
+We also completed a hosted wallet-connected StudioNet contribution, cancellation, and refund lifecycle using a disposable test program. The parent withdrawal succeeded, its child transfer finalized for exactly 0.001 GEN to the connected wallet, and a fresh contract read showed the refund entitlement at zero. Transaction IDs and before/after wallet balances are in [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md). This successful transfer does not demonstrate recovery from a failed child payment.
+

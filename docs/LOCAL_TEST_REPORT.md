@@ -2,6 +2,22 @@
 
 The live failed-child recovery gate and required evidence are documented in [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
 
+## Hosted wallet refund lifecycle — October 24, 2026
+
+The hosted Vercel application completed a real Rabby-connected StudioNet `61999` contribution, cancellation, and refund using the user's test wallet `0x7d1170bc98624f98183972fabd69418bb7d5d541`. The beneficiary test address was `0x5516488131150ccbe76341e5abd472013ecaa666`.
+
+| Step | Transaction | Observed result |
+| --- | --- | --- |
+| Create isolated test program `walletflow_20261024_7d118` | `0x0871ea57d9191f75e9a4d254096ffecda1d5943f40b5411ddc10ed3c782d32ea` | `FINALIZED`, GenVM `SUCCESS` |
+| Contribute | `0x583f427d8dbcafaa987d2ff14d347fee7ad5c0a9bf9c40a106a5f81d5c61d231` | `FINALIZED`, `SUCCESS`, `0.001 GEN` |
+| Cancel test program | `0x41a6c1eaf7fa3007688a10c1b617766c15fa5148a50c786772a55e39154cf510` | `FINALIZED`, `SUCCESS` |
+| Withdraw refund | `0xdc921745069d3fcda4771e4aa66dcb449c76b036a22e641182540afd4f3df4c3` | Explorer: `SUCCESS`, return value `1000000000000000` wei (`0.001 GEN`); final child listed below |
+| Refund child transfer | `0x6950c5b9082c1c294d39a57f2b178cb51f8e7fb5229961a5f20c195dff8c138d` | `FINALIZED`, contract sent `0.001 GEN` to the connected test wallet |
+
+The connected wallet's explorer balance read was `399.896999 GEN` before withdrawal and `399.898 GEN` afterward (observed difference `+0.001001 GEN`). The finalized child itself transferred exactly `0.001 GEN`; the additional `0.000001 GEN` balance difference is not attributed to that child. Contract `get_account` reads showed `refund_due_wei = 1000000000000000` before withdrawal and `0` after it. The earlier app version displayed a false failure despite the successful receipt; this was traced to StudioNet's SDK returning `ACCEPTED` for decided transactions while the UI required the literal `FINALIZED` status. The status check was fixed and pushed to GitHub; production deployment verification is still pending.
+
+An earlier isolated program `walletflow_20261024_7d117` was created with a funding window that elapsed before its contribution was submitted. Its contribution reverted with “Funding period has ended” and transferred no funds. The replacement program above was used for the successful lifecycle. These were disposable test records, not public campaigns.
+
 ## Follow-up state check — October 23, 2026
 
 Read-only CLI checks confirmed the selected network is `studionet`, chain ID `61999`, and the existing test fixture `0x2C64F7BF0A156b03B250321CD893E3bb2188308A` currently reports four program IDs. Fresh `get_program` reads showed:
@@ -15,7 +31,7 @@ Read-only CLI checks confirmed the selected network is `studionet`, chain ID `61
 
 The completed full and partial withdrawals and their previously captured immediate recipient balance deltas are detailed above. Fresh `get_account` reads for both wallets on both settled programs returned zero refund due; fresh program reads returned zero beneficiary due. The program-level `refundable_wei` field retains the original settlement allocation and is not the current donor entitlement. This follow-up performed no transaction. Current CLI balance reads were Tenant 1 `0.10646 GEN` and Tenant 2 `0.0925 GEN`; these are point-in-time balances, not before/after measurements for a new withdrawal.
 
-The requested hosted wallet-connected path was not completed in this pass. The local Vite server started at `http://localhost:5173/`, and Chrome was present, but its window screenshot capture timed out twice after refreshing the returned window handle. The computer-use recovery procedure then required stopping UI interaction. The CLI's `write` command also does not expose a payable-value option for `contribute`. No wallet approval, signature, or transaction was attempted. The browser wallet lifecycle remains pending a functioning local Chrome control session with the user's test wallet connected. Existing Playwright wallet tests use a mocked EIP-1193 provider and are not presented as real-wallet proof.
+At the time of this October 23 check, the hosted wallet lifecycle had not yet been completed. It was subsequently completed on October 24; see the hosted lifecycle section above. Existing Playwright wallet tests use a mocked EIP-1193 provider and are not presented as real-wallet proof.
 
 The separate failed-child recovery gate also remains open. StudioNet probe receipts and the EVM support constraint are recorded in [`STUDIONET_RECOVERY_PROBE.md`](STUDIONET_RECOVERY_PROBE.md) and [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Public-value funding remains **NO-GO**.
 

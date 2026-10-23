@@ -66,3 +66,4 @@ class StudioNetFailureProbe(gl.Contract):
     @gl.public.view
     def get_balance(self) -> u256:
         return u256(self.balance)
+
