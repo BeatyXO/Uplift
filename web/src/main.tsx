@@ -136,7 +136,7 @@ function CreateForm({ready,onSubmit}:{ready:boolean;onSubmit:(a:ChainAction)=>Pr
   const [url,sha,size]=evidenceInput(form.baseline_url,form.baseline_sha,form.baseline_size);
   // Read native datetime-local values from the submitted form. Some browsers
   // update the visible date segments before React's controlled value catches up.
-  const submittedFields=new FormData(e.currentTarget);
+  const submittedFields=new FormData(e.currentTarget as HTMLFormElement);
   const fundingDate=String(submittedFields.get('funding_date')||'');
   const claimDate=String(submittedFields.get('claim_date')||'');
   const fundingMs=Date.parse(fundingDate);const claimMs=Date.parse(claimDate);const now=Date.now();
