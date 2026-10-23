@@ -30,7 +30,7 @@ Scope: `contracts/Uplift.py` and browser signing flows. This is author analysis,
 
 **4. Malicious evidence instruction injection (MEDIUM):** Raw documents are placed into an explicit untrusted JSON field and model instructions require ignoring embedded commands. This is a defense, not an infallible guarantee. Test with adversarial evidence at runtime.
 
-**5. External evidence liveness (MEDIUM):** Even commit-pinned GitHub URLs can go offline, be deleted or be blocked for particular validators. Uplift refuses mismatched bytes, leaving REVIEW pending; anyone can invoke timeout after 14 days. That protects money at the cost of delayed outcomes.
+**5. External evidence liveness (MEDIUM):** Baseline and beneficiary claim URLs are still fetched by the leader and validators during assessment; pinned GitHub content can be unavailable or blocked, leaving REVIEW pending until the 14-day timeout. Counterevidence is fetched, hash/size/UTF-8 checked, and independently validator-checked at admission; the exact validated text is retained in bounded on-chain challenge records, so later host outage or deletion cannot block assessment. An unavailable or mismatched counterevidence submission fails before it consumes a donor challenge slot. This protects settlement from invalid challenge URLs without excluding small donors who provide valid evidence. It does not solve baseline/claim host outages.
 
 **6. Contest opportunity (MEDIUM):** Counterevidence is limited to funded donors to reduce spam, which excludes outside whistleblowers. The 24-hour challenge window may be short for community scrutiny. Making the window longer improves fairness but increases lockup duration.
 

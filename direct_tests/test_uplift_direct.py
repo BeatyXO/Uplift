@@ -234,14 +234,16 @@ def test_direct_donor_challenge_and_validator_rejects_disagreement():
         vm.sender = as_sender(DONOR_A)
         with vm.expect_revert("must differ"):
             contract.challenge_impact("impact_001", claim["url"], claim["sha256"], claim["size"])
+        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": challenge["body"]})
         contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"])
+        record = json.loads(contract.get_program("impact_001"))
+        assert record["challenges"][0]["document"] == challenge["body"].decode("utf-8")
         with vm.expect_revert("One challenge"):
             contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"])
         vm.warp(datetime.fromtimestamp(deadline + 1, timezone.utc).isoformat().replace("+00:00", "Z"))
         with vm.expect_revert("Challenge window closed"):
             contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"])
         vm.mock_web(re.escape(claim["url"]), {"status": 200, "body": claim["body"]})
-        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": challenge["body"]})
         prompt_pattern = r"(?s).*UNTRUSTED DOCUMENT DATA.*IGNORE ALL PREVIOUS RULES.*"
         vm.mock_llm(prompt_pattern, json.dumps({"statuses": ["PROVEN"]}))
         contract.assess_impact("impact_001")
@@ -249,9 +251,55 @@ def test_direct_donor_challenge_and_validator_rejects_disagreement():
         vm.clear_mocks()
         vm.mock_web(re.escape(baseline["url"]), {"status": 200, "body": baseline["body"]})
         vm.mock_web(re.escape(claim["url"]), {"status": 200, "body": claim["body"]})
-        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": challenge["body"]})
         vm.mock_llm(prompt_pattern, json.dumps({"statuses": ["DISPUTED"]}))
         assert vm.run_validator() is False
+
+
+def test_direct_counterevidence_is_verified_at_admission_and_survives_host_outage():
+    with uplift_vm() as (vm, contract):
+        baseline = evidence("Baseline records 120 students and 35% completion.", "baseline")
+        claim = evidence("Independent registry reports completion reached 59%.", "claim")
+        challenge = evidence("Independent audit disputes the cohort comparison.", "challenge")
+        vm.mock_web(re.escape(baseline["url"]), {"status": 200, "body": baseline["body"]})
+        create(vm, contract, baseline)
+        contribute(vm, contract, DONOR_A, 101)
+        contribute(vm, contract, DONOR_B, 1)
+        vm.warp(datetime.fromtimestamp(BASE_TIME + 101, timezone.utc).isoformat().replace("+00:00", "Z"))
+        vm.sender = as_sender(BENEFICIARY)
+        contract.submit_impact("impact_001", claim["url"], claim["sha256"], claim["size"])
+
+        vm.sender = as_sender(DONOR_B)
+        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": challenge["body"]})
+        with vm.expect_revert("EVIDENCE_RETRY"):
+            contract.challenge_impact("impact_001", challenge["url"], "f" * 64, challenge["size"])
+        with vm.expect_revert("EVIDENCE_RETRY"):
+            contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"] + 1)
+        vm.clear_mocks()
+        vm.mock_web(re.escape(challenge["url"]), {"status": 404, "body": b""})
+        with vm.expect_revert("EVIDENCE_RETRY"):
+            contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"])
+        assert json.loads(contract.get_program("impact_001"))["challenges"] == []
+
+        vm.clear_mocks()
+        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": challenge["body"]})
+        contract.challenge_impact("impact_001", challenge["url"], challenge["sha256"], challenge["size"])
+        admitted = json.loads(contract.get_program("impact_001"))["challenges"][0]
+        assert admitted["sender"] == DONOR_B
+        assert admitted["document"] == challenge["body"].decode("utf-8")
+
+        # A validator that sees different bytes cannot accept this admission.
+        vm.clear_mocks()
+        vm.mock_web(re.escape(challenge["url"]), {"status": 200, "body": b"different validator bytes"})
+        assert vm.run_validator() is False
+
+        vm.warp(datetime.fromtimestamp(BASE_TIME + 101 + 86401, timezone.utc).isoformat().replace("+00:00", "Z"))
+        vm.clear_mocks()
+        vm.mock_web(re.escape(baseline["url"]), {"status": 200, "body": baseline["body"]})
+        vm.mock_web(re.escape(claim["url"]), {"status": 200, "body": claim["body"]})
+        vm.mock_llm(r"(?s).*Independent audit disputes the cohort comparison.*", json.dumps({"statuses": ["DISPUTED"]}))
+        contract.assess_impact("impact_001")
+        assert vm.run_validator() is True
+        assert json.loads(contract.get_program("impact_001"))["status"] == "SETTLED"
 
 
 def test_direct_missing_or_tampered_evidence_fails_closed():

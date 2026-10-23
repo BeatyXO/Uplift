@@ -113,8 +113,36 @@ def test_challenge_no_self(world):
 
 def test_no_duplicate_counterevidence(world):
     c,ctx,m,claim=submitted(world);ctx.sender=DONORS[0];p=proof('Independent outcome contradiction')
+    ctx.responses[p[0]]=p[3]
     c.challenge_impact('impact_001',*p[:3])
     with pytest.raises(UserError,match='One challenge'):c.challenge_impact('impact_001',*p[:3])
+
+def test_bad_counterevidence_digest_does_not_consume_slot(world):
+    c,ctx,m,claim=submitted(world);ctx.sender=DONORS[0];p=proof('Independent outcome contradiction')
+    ctx.responses[p[0]]=p[3]
+    with pytest.raises(UserError,match='EVIDENCE_RETRY'):
+        c.challenge_impact('impact_001',p[0],'f'*64,p[2])
+    assert json.loads(c.get_program('impact_001'))['challenges']==[]
+    c.challenge_impact('impact_001',*p[:3])
+    record=json.loads(c.get_program('impact_001'))
+    assert len(record['challenges'])==1 and record['challenges'][0]['document']==p[3].decode()
+
+def test_unavailable_counterevidence_does_not_consume_slot(world):
+    c,ctx,m,claim=submitted(world);ctx.sender=DONORS[0];p=proof('Independent outcome contradiction')
+    with pytest.raises(UserError,match='EVIDENCE_RETRY'):
+        c.challenge_impact('impact_001',*p[:3])
+    assert json.loads(c.get_program('impact_001'))['challenges']==[]
+    ctx.responses[p[0]]=p[3]
+    c.challenge_impact('impact_001',*p[:3])
+    assert len(json.loads(c.get_program('impact_001'))['challenges'])==1
+
+def test_minimal_contribution_donor_can_file_valid_counterevidence(world):
+    c,ctx,m,claim=submitted(world,amounts=(101,202,303,1));p=proof('Independent outcome contradiction')
+    ctx.responses[p[0]]=p[3];ctx.sender=DONORS[3]
+    c.challenge_impact('impact_001',*p[:3])
+    record=json.loads(c.get_program('impact_001'))
+    assert record['challenges'][0]['sender']==DONORS[3]
+    assert record['challenges'][0]['document']==p[3].decode()
 
 def test_no_challenge_after_cutoff(world):
     c,ctx,m,claim=submitted(world);ctx.sender=DONORS[0];p=proof('Independent outcome contradiction')

@@ -4,7 +4,7 @@ Updated: 2026-10-21
 
 ## Status
 
-**NOT VERIFIED on StudioNet. Public funding remains NO-GO until this test passes.**
+**NOT VERIFIED on StudioNet. Public funding remains NO-GO until this test passes.** This is a production/public-funding release gate; it is not a blocker to submitting the prototype for steward review.
 
 Uplift implements the payable `__on_errored_message__` callback and recipient-only `withdraw_recovered_payout` retry. GenLayer Direct Mode tests the contract's recovery state logic, but that does not establish that StudioNet dispatches the callback with the correct failed recipient and returned value. Successful payout children do not prove failed-payment recovery.
 
