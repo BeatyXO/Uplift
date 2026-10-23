@@ -2,6 +2,23 @@
 
 The live failed-child recovery gate and required evidence are documented in [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
 
+## Follow-up state check — October 23, 2026
+
+Read-only CLI checks confirmed the selected network is `studionet`, chain ID `61999`, and the existing test fixture `0x2C64F7BF0A156b03B250321CD893E3bb2188308A` currently reports four program IDs. Fresh `get_program` reads showed:
+
+| Program | Observed state | Pool / remaining entitlements |
+| --- | --- | --- |
+| `uplift_full_1792601545323` | `FUNDING`; no donors | Pool `0`; no award or refund due |
+| `uplift_partial_1792601629769` | `FUNDING`; no donors | Pool `0`; no award or refund due |
+| `uplift_full_1792601730320` | `SETTLED`, `[PROVEN]`, 10,000 bps | Original pool `0.005 GEN`; beneficiary due `0`; Tenant 2 refund due `0` |
+| `uplift_partial_1792601730321` | `SETTLED`, `[PROVEN, UNPROVEN]`, 5,000 bps | Original pool `0.005 GEN` (including `0.0025 GEN` original refund allocation); beneficiary due `0`; Tenant 2 refund due `0` |
+
+The completed full and partial withdrawals and their previously captured immediate recipient balance deltas are detailed above. Fresh `get_account` reads for both wallets on both settled programs returned zero refund due; fresh program reads returned zero beneficiary due. The program-level `refundable_wei` field retains the original settlement allocation and is not the current donor entitlement. This follow-up performed no transaction. Current CLI balance reads were Tenant 1 `0.10646 GEN` and Tenant 2 `0.0925 GEN`; these are point-in-time balances, not before/after measurements for a new withdrawal.
+
+The requested hosted wallet-connected path was not exercised in this pass. The available browser control exposed only an empty in-app browser, with no local Chrome profile or injected wallet; the CLI's `write` command does not expose a payable-value option for `contribute`. No wallet approval, signature, or transaction was attempted. The browser wallet lifecycle therefore remains pending a local Chrome session with the user's test wallet connected. Existing Playwright wallet tests use a mocked EIP-1193 provider and are not presented as real-wallet proof.
+
+The separate failed-child recovery gate also remains open. StudioNet probe receipts and the EVM support constraint are recorded in [`STUDIONET_RECOVERY_PROBE.md`](STUDIONET_RECOVERY_PROBE.md) and [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Public-value funding remains **NO-GO**.
+
 ## StudioNet assessment and local frontend resume — October 21, 2026
 
 The already deployed test-only contract was left with its original 24-hour review deadline; it was not shortened or bypassed. On StudioNet chain `61999`, program `uplift_cycle_20261020c` at `0xd8173621f871740A5447c954701ACc2196b804Bb` reached its challenge deadline at `2026-10-21 11:09:04 UTC` (`12:09:04` Africa/Lagos). A fresh read after the deadline showed it remained in `REVIEW` until assessment was explicitly submitted.
@@ -248,3 +265,4 @@ Run [39330158930](https://github.com/BeatyXO/Uplift/actions/runs/39330158930) pa
 The first CI attempt identified two environment/test-fixture issues: Direct Mode's release asset name had changed, and headless browser clipboard permissions were unavailable. CI now caches the official pinned combined GenVM runner bundle under the loader's expected versioned cache name, and the browser fixture stubs clipboard methods while exercising the actual wallet menu. The successful rerun confirms these CI paths.
 
 The local Windows `npm run build` remains blocked by `spawn EFTYPE`; the same build succeeds in CI. A local npm audit retry could not reach the npm advisory endpoint, while the successful CI audit reported zero production vulnerabilities. No StudioNet transactions or deployments were made. Failed child external payments still lack a proven recovery mechanism, so real-value funding remains **NO-GO**.
+
