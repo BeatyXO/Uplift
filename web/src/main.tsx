@@ -11,6 +11,17 @@ type View='overview'|'programs'|'create'|'ledger'|'guide';
 type Action='contribute'|'claim'|'challenge'|'assess'|'expire'|'timeout'|'cancel'|'award'|'refund';
 const menu=[{id:'overview',name:'Overview',icon:LayoutDashboard},{id:'programs',name:'Impact programs',icon:Layers3},{id:'create',name:'Create program',icon:Plus},{id:'ledger',name:'Capital ledger',icon:Scale},{id:'guide',name:'Protocol guide',icon:BookOpen}] as const;
 function pct(bps:number){return (bps/100).toFixed(bps%100===0?0:2)+'%'}
+function errorText(error:unknown):string{
+ if(error instanceof Error)return error.message;
+ if(typeof error==='string')return error;
+ if(error&&typeof error==='object'){
+  const value=error as Record<string,unknown>;
+  const message=[value.shortMessage,value.message,value.reason,value.details].find(x=>typeof x==='string'&&x.trim());
+  if(typeof message==='string')return message;
+  try{return JSON.stringify(error)}catch{return 'Unknown wallet or network error'}
+ }
+ return String(error);
+}
 function classStatus(status:string){return status==='SETTLED'?'assessed':status==='REVIEW'?'review':status==='FUNDING'?'funding':'muted'}
 function Status({value}:{value:string}){return <span className={'status '+classStatus(value)}><span className="status-dot"/>{statusLabel(value)}</span>}
 function SectionHead({eyebrow,title,description}:{eyebrow:string;title:string;description:string}){return <div className="section-head"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2><p>{description}</p></div></div>}
@@ -75,7 +86,7 @@ function App(){
  const reviewed=programs.filter(p=>p.status==='SETTLED').length;
  const funder=programs.filter(p=>account[p.id]&&BigInt(account[p.id].pledge_wei)>0n).length;
  const open=(a:Action,p:Program)=>{setAction(a);setActionProgram(p.id);setNotice('');setError('');setTx('')};
- const start=async(a:ChainAction)=>{setBusy(true);setError('');setNotice('');setTx('');try{if(wrongNetwork)throw new Error('Switch to StudioNet 61999 before submitting');const h=await sendTransaction(wallet,a,setTx);setNotice('Finalized successfully. State has been refreshed.');setTx(h);setAction(null);await refresh();}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}};
+ const start=async(a:ChainAction)=>{setBusy(true);setError('');setNotice('');setTx('');try{if(wrongNetwork)throw new Error('Switch to StudioNet 61999 before submitting');const h=await sendTransaction(wallet,a,setTx);setNotice('Finalized successfully. State has been refreshed.');setTx(h);setAction(null);await refresh();}catch(e){setError(errorText(e))}finally{setBusy(false)}};
  const onConnect=async()=>{try{setError('');const account=await connectWallet();setWallet(account);const provider=getWalletProvider();setWalletChain(provider?await getInjectedChain(provider):null);setWalletMenuOpen(false)}catch(e){setError(e instanceof Error?e.message:String(e))}};
  const onDisconnect=()=>{disconnectWallet(window.localStorage);setWallet('');setAccount({});setRecoveredPayout(null);setWalletMenuOpen(false);setWalletChain(null);setNotice('Wallet disconnected from Uplift. Your extension may remain authorized.');};
  const onCopy=async()=>{try{await navigator.clipboard.writeText(wallet);setCopyLabel('Copied!');window.setTimeout(()=>setCopyLabel('Copy address'),1800)}catch{setError('Clipboard unavailable. Copy the address from your wallet extension.')}};
