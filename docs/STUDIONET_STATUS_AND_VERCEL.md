@@ -1,12 +1,12 @@
 # StudioNet status and Vercel configuration
 
-Updated: 2026-10-21
+Updated: 2026-10-23
 
 ## What has actually been deployed and exercised
 
 Uplift has **test-only** deployments on GenLayer StudioNet (chain ID `61999`). The corrected contract at `0xd8173621f871740A5447c954701ACc2196b804Bb` finalized with successful execution and majority agreement. A separate fast-window fixture at `0x2C64F7BF0A156b03B250321CD893E3bb2188308A` was used for the full- and partial-earning cycles recorded in [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md). Those cycles finalized, emitted payout children that finalized, and produced the recorded recipient balance deltas.
 
-Those successful transfers do **not** test the failure callback. No live child-payment failure, callback credit, recovery retry, or post-retry balance delta has been observed. Public-value funding therefore remains **NO-GO**.
+Those successful transfers do **not** test the failure callback. A separate controlled StudioNet probe did produce a finalized internal child execution error, but it credited the receiver and did not invoke the source callback. No callback credit, recovery retry, or post-retry balance delta has been observed for Uplift's external EVM payout path. Public-value funding therefore remains **NO-GO**.
 
 `deployments/studionet.json` remains `NOT_DEPLOYED` by release policy: it is the release manifest, and no deployment is approved for release until failed-child recovery and the remaining release gates pass. This status does not mean no test contract was ever deployed. The addresses above are isolated test contracts and must not be presented as production deployments.
 
@@ -31,4 +31,4 @@ The contract implements `__on_errored_message__`, and GenLayer Direct Mode tests
 3. A recipient-signed recovery retry, its finalized successful child, and the exact recipient EOA balance increase.
 4. Fresh reads proving the recovered amount is zero after successful retry and that no duplicate claim remains.
 
-No failure has been deliberately triggered. In addition to the local toolchain lacking `forge`, `solc`, and `cast`, current GenLayer docs state that hosted Studio does not implement EVM-contract interaction beyond value transfers to EOAs and has no EVM layer or ghost contracts for Studio balances. That prevents a controlled rejecting EVM recipient on StudioNet, even if a local Solidity compiler is installed. This remains the exact StudioNet testability constraint; do not claim the recovery path verified until a supported test environment produces the required receipts and balance changes. See [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md), [`FINANCIAL_SETTLEMENT.md`](FINANCIAL_SETTLEMENT.md), and [`SECURITY.md`](SECURITY.md).
+An isolated StudioNet probe on 2026-10-23 exercised two non-production failure cases. An EOA/no-IC child finalized `NO_MAJORITY` at `contract_not_found_handler` with no callback credit. A controlled payable IC recipient deliberately errored; its child finalized with `execution_result = ERROR` and `value_credited = true`, while the sender callback count and recovered amount stayed zero. This does not verify Uplift's external EVM transfer failure path. Current GenLayer docs also state that hosted Studio does not implement EVM-contract interaction beyond value transfers to EOAs and has no EVM layer or ghost contracts for Studio balances. That prevents deploying the controlled EVM recipient needed to test the production path on StudioNet. Full live evidence is in [`STUDIONET_RECOVERY_PROBE.md`](STUDIONET_RECOVERY_PROBE.md). Keep the release gate open until the required external path is tested in a supported environment accepted by the steward. See [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md), [`FINANCIAL_SETTLEMENT.md`](FINANCIAL_SETTLEMENT.md), and [`SECURITY.md`](SECURITY.md).

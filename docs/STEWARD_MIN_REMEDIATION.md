@@ -12,7 +12,7 @@ Coverage includes incorrect digests, incorrect byte lengths, unavailable documen
 
 ## Finding 2: live StudioNet failed-child recovery
 
-**Status: not yet verified on StudioNet.** The contract recovery callback and retry logic are exercised in Direct Mode, but no observed live failed child receipt yet demonstrates callback dispatch, exact recipient credit, restored contract funds, successful retry, and recipient balance delta. The precise live procedure and evidence requirements are in [FAILED_CHILD_RECOVERY_STATUS.md](FAILED_CHILD_RECOVERY_STATUS.md).
+**Status: external EVM payout recovery remains unverified.** A live StudioNet probe on 2026-10-23 finalized a value-bearing payable IC child with `execution_result = ERROR` and `value_credited = true`; the recipient balance rose by exactly 0.00001 GEN, but the source callback count and recovered credit stayed at zero. A separate no-IC EOA routing child finalized `NO_MAJORITY` without callback credit. Neither exercises Uplift's external EVM payout path, which StudioNet currently cannot test with a controlled reverting EVM recipient. Full receipts and balance reads are in [STUDIONET_RECOVERY_PROBE.md](STUDIONET_RECOVERY_PROBE.md); the remaining external test steps are in [FAILED_CHILD_RECOVERY_STATUS.md](FAILED_CHILD_RECOVERY_STATUS.md).
 
 This remains a public-funding release gate. It is not represented as a completed live-chain test or as proof supplied for the steward review.
 
