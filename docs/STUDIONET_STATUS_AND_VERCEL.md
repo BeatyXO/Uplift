@@ -1,6 +1,6 @@
 # StudioNet status and Vercel configuration
 
-Updated: 2026-10-23
+Updated: 2026-10-24
 
 ## What has actually been deployed and exercised
 
@@ -20,7 +20,7 @@ VITE_UPLIFT_CONTRACT_ADDRESS=0x2C64F7BF0A156b03B250321CD893E3bb2188308A
 
 This is a public build-time frontend setting, not a secret. It points at the isolated 60-second StudioNet fixture, not a production contract. Use it for a Preview deployment only while the release gate is open. Do not configure a production launch to accept public funding with this address. After Vercel saves the variable, redeploy so Vite embeds it in the browser bundle.
 
-The app's chain is fixed to StudioNet `61999`; there are no RPC key, wallet private key, or server-side secret environment variables required by this frontend. The Vercel deployment itself is the user's step.
+The app's chain is fixed to StudioNet `61999`; there are no RPC key, wallet private key, or server-side secret environment variables required by this frontend. The Vercel deployment itself is the user's step. Hosting the frontend on Vercel does not change StudioNet's chain-layer capabilities; successful live wallet transactions through Vercel prove that hosted flow, not that Studio can execute a reverting EVM-contract recipient.
 
 ## Failed-child recovery verification still required
 

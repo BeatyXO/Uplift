@@ -1,6 +1,6 @@
 # Steward MIN remediation
 
-Updated: 2026-10-23
+Updated: 2026-10-24
 
 ## Finding 1: counterevidence could block settlement
 
@@ -29,6 +29,10 @@ This remains a public-funding release gate. It is not represented as a completed
 These are local/source verification results. They do not replace the still-pending live failed-child test. The hosted real-wallet contribution/cancellation/refund lifecycle was completed on October 24, 2026 and is recorded with transaction IDs and balance reads in [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md).
 
 ## Suggested steward resubmission note
+
+The following response is 989 characters and stays within the MIN form's 1,000-character limit:
+
+> Thank you for the review. Counterevidence admission now requires leader and validator retrieval of matching UTF-8 bytes, size, and SHA-256; invalid or unavailable documents do not consume a challenge slot. Python and Direct Mode tests cover bad digests/sizes, unavailable sources, validator disagreement, minimal donors, and later source outages. We completed full and partial assessments and a real wallet-connected contribution/cancellation/refund on the Vercel-hosted app; receipts and balance reads are documented. The wallet-status UI bug is fixed and pushed. The failed external EVM child recovery test cannot currently run on StudioNet: Studio does not execute EVM contracts and supports only EOA transfers, leaving no controlled recipient to reject payout. Our internal-message probe did not verify Uplift’s external callback or retry. We do not claim it did. Public funding remains disabled. Please confirm whether an alternative EVM-capable environment will satisfy this finding.
 
 We addressed the counterevidence admission issue. A challenge is now admitted only after the leader and validators retrieve matching bytes and verify the declared size and SHA-256. Invalid or unavailable submissions do not consume a challenge slot; verified text is retained and integrity-checked during assessment so a later source outage cannot block settlement. Regression coverage includes incorrect digests, incorrect sizes, unavailable sources, validator disagreement, minimal-contribution donors, and post-admission source outage in both Python tests and GenLayer Direct Mode.
 
