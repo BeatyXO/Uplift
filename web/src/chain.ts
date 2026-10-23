@@ -67,7 +67,13 @@ export async function sendTransaction(wallet:string, action:ChainAction,onSubmit
   const write={address:getContract() as `0x${string}`,functionName:action.method,args:action.args,value:action.value??0n};
   const hash=await client.writeContract(write);
   onSubmitted(hash);
-  const result=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});
-  if(result.statusName!==TransactionStatus.FINALIZED||result.txExecutionResultName!==ExecutionResult.FINISHED_WITH_RETURN)throw new Error(`Transaction ${hash} finalized without successful execution; inspect explorer before retrying`);
+  // GenLayer StudioNet reports successfully decided transactions as ACCEPTED
+  // through this SDK even when the explorer has advanced them to Finalized.
+  // The SDK treats ACCEPTED as its decided-state threshold; still require a
+  // successful GenVM return and reject every non-success terminal state.
+  const result=await client.waitForTransactionReceipt({hash,status:TransactionStatus.ACCEPTED});
+  const decidedSuccessfully=result.statusName===TransactionStatus.ACCEPTED||result.statusName===TransactionStatus.FINALIZED;
+  if(!decidedSuccessfully||result.txExecutionResultName!==ExecutionResult.FINISHED_WITH_RETURN)throw new Error(`Transaction ${hash} did not reach a successful decided state (status: ${result.statusName??'unknown'}, execution: ${result.txExecutionResultName??'unknown'}); inspect explorer before retrying`);
   return hash;
 }
+
