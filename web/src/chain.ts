@@ -62,7 +62,8 @@ export async function sendTransaction(wallet:string, action:ChainAction,onSubmit
   const accounts=await provider.request({method:'eth_accounts'});
   if(!Array.isArray(accounts)||!accounts.some(a=>typeof a==='string'&&a.toLowerCase()===wallet.toLowerCase())) throw new Error('Active wallet changed. Reconnect before signing');
   const client=createClient({chain:studionet,account:wallet as `0x${string}`,provider});
-  await client.connect('studionet');
+  // createClient already has the StudioNet chain. client.connect() currently
+  // probes/installs a MetaMask Snap, which EIP-1193 wallets like Rabby do not support.
   const write={address:getContract() as `0x${string}`,functionName:action.method,args:action.args,value:action.value??0n};
   const hash=await client.writeContract(write);
   onSubmitted(hash);
