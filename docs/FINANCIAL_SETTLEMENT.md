@@ -33,6 +33,7 @@ For every future live test, record parent and child transaction identifiers, ter
 
 ## Required release gate
 
-Keep the release manifest status `NOT_DEPLOYED` until the isolated test deployment and lifecycle have established all of the following: a failed child dispatches the hook exactly once with the correct recipient and exact value; a pending or ambiguous child remains locked; a successful child does not invoke recovery; a failed retry restores the same recipient balance; unrelated accounts cannot recover another party's funds; and aggregate liabilities and GEN balances reconcile through every transition. Direct Mode currently exercises callback logic only; it does not simulate child scheduling or protocol callback dispatch. Then independently review and rerun the financial lifecycle suite before any public value-custody release.
+Keep an observed test deployment marked `TEST_DEPLOYED_RELEASE_BLOCKED` until the isolated lifecycle establishes all of the following: a failed child dispatches the hook exactly once with the correct recipient and exact value; a pending or ambiguous child remains locked; a successful child does not invoke recovery; a failed retry restores the same recipient balance; unrelated accounts cannot recover another party's funds; and aggregate liabilities and GEN balances reconcile through every transition. Direct Mode currently exercises callback logic only; it does not simulate child scheduling or protocol callback dispatch. Then independently review and rerun the financial lifecycle suite before any public value-custody release.
 
 This limitation does not invalidate the deterministic allocation invariant. It prevents claiming that calculated entitlements are reliably delivered.
+
