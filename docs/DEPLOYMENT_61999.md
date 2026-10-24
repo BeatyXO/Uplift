@@ -20,7 +20,7 @@ genvm-lint check contracts/Uplift.py --json
 genvm-lint typecheck contracts/Uplift.py --json
 ```
 
-The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. The recovery callback and retry state logic pass Direct Mode, but Direct Mode does not model protocol child failure or callback dispatch. A trusted signer may deploy an isolated test instance solely to run the recovery lifecycle below; do not market it or accept public contributions while callback semantics remain unverified. Keep `deployments/studionet.json` at `NOT_DEPLOYED` until the observed deployment and required checks are complete.
+The local Python tests are a custom emulator: they cannot replace `gltest` Direct Mode or a real node. The recovery callback and retry state logic pass Direct Mode, but Direct Mode does not model protocol child failure or callback dispatch. A trusted signer may deploy an isolated test instance solely to run the recovery lifecycle below; do not market it or accept public contributions while callback semantics remain unverified. Record observed test deployments as `TEST_DEPLOYED_RELEASE_BLOCKED`; set `release_approved` only after all required checks are complete.
 
 ## 2. Confirm exact chain identity
 
@@ -47,7 +47,7 @@ If RPC returns HTTP 403/502, stop. Do not claim any deploy or replay a write wit
 genlayer deploy --contract contracts/Uplift.py
 ```
 
-The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Deploy with minimal test value and no public funding promotion. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`. A test contract may be deployed and exercised before release; keep the release manifest `NOT_DEPLOYED` until the child-failure/recovery lifecycle and all release checks complete successfully. This manifest status means no release-approved deployment, not that test contracts do not exist.
+The Uplift constructor has **no arguments**. Do not append `--args []` or any unverified address. Deploy with minimal test value and no public funding promotion. Record exact `tx_hash` and `contract_address` from the CLI and check finalized **and** successful execution. Verify the deployed normalized source against `sha256sum contracts/Uplift.py`. A test contract may be deployed and exercised before release; record it as `TEST_DEPLOYED_RELEASE_BLOCKED` until the child-failure/recovery lifecycle and all release checks complete successfully. Do not conflate a blocked release with a contract that was never deployed.
 
 ## 4. Register an actual program
 
@@ -109,3 +109,4 @@ No fake values or `example` hashes may be passed off as deployment evidence.
 - Source supports `0xf22f` injected wallet switching and previously authorized account restoration. Confirm behavior against real extension (including chain-change events) before launch.
 - Require passing dependency-backed `npm run typecheck`, `npm run build`, `npm test` and real browser smoke. Network-restricted build environment here could only run Node tests and TS transpilation.
 - Never label a payout received merely because the source chain transaction is finalized. Validate child transfer.
+
