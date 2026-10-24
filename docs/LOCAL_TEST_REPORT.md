@@ -1,6 +1,6 @@
 # Local verification report — October 19, 2026
 
-The live failed-child recovery gate and required evidence are documented in [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). Test contracts and successful full/partial payout cycles exist; the release manifest remains `NOT_DEPLOYED` until live failed-child recovery is verified.
+The live failed-child recovery gate and required evidence are documented in [`FAILED_CHILD_RECOVERY_STATUS.md`](FAILED_CHILD_RECOVERY_STATUS.md). Deployment status clarification and the Vercel Preview environment value are in [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md). The release manifest now records the deployed test fixture as `TEST_DEPLOYED_RELEASE_BLOCKED`; the live failed-child recovery gate is still open.
 
 ## Hosted wallet refund lifecycle — October 24, 2026
 
