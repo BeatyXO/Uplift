@@ -3,13 +3,18 @@
   "chain_id": 61999,
   "rpc": "https://studio.genlayer.com/api",
   "explorer": "https://explorer-studio.genlayer.com",
-  "deployment_status": "NOT_DEPLOYED",
-  "contract_address": null,
-  "deploy_tx_hash": null,
-  "source_sha256_lf": null,
-  "verified_finalization": false,
-  "verified_successful_execution": false,
-  "live_lifecycle_verified": false,
-  "parent_and_child_transfers_verified": false,
-  "comment": "Intentionally empty. Populate only from genuine observed network events."
+  "deployment_status": "TEST_DEPLOYED_RELEASE_BLOCKED",
+  "deployment_kind": "isolated_fast_window_test_fixture",
+  "contract_address": "0x2C64F7BF0A156b03B250321CD893E3bb2188308A",
+  "deploy_tx_hash": "0xd2562923b9c51e2e2e3e9ad2a24e44536fd33c46e681461eceb85abb5a44a539",
+  "source_sha256_lf": "A9784B48D208A655A0B1A379BF855AAB13F2D758D5AD762C8AA912EE036CD71A",
+  "deployed_source_file": "tests/fixtures/UpliftFastTest.py at deployment time",
+  "verified_finalization": true,
+  "verified_successful_execution": true,
+  "live_lifecycle_verified": true,
+  "parent_and_child_transfers_verified": true,
+  "failed_child_recovery_verified": false,
+  "release_approved": false,
+  "comment": "Observed StudioNet test fixture used by the hosted wallet flow and full/partial payout tests. Successful lifecycle and child transfers are documented; failed-child recovery is unverified, so this test deployment is not approved for public funding. The recorded source hash is the 60-second fixture source at deployment time, not the current contracts/Uplift.py."
 }
+
