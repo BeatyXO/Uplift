@@ -30,7 +30,7 @@ When a controlled reverting recipient is supported, run against an isolated Stud
 
 ## Release gate
 
-Do not mark this recovery path verified or approve public value custody until every step above is supported by observed StudioNet receipts and balance reads. Keep `deployments/studionet.json` at `NOT_DEPLOYED` until this and the other release gates pass.
+Do not mark this recovery path verified or approve public value custody until every step above is supported by observed StudioNet receipts and balance reads. Keep the deployment marked `TEST_DEPLOYED_RELEASE_BLOCKED` and `release_approved: false` until this and the other release gates pass.
 
 Related evidence and design notes: [`LOCAL_TEST_REPORT.md`](LOCAL_TEST_REPORT.md), [`FINANCIAL_SETTLEMENT.md`](FINANCIAL_SETTLEMENT.md), [`SECURITY.md`](SECURITY.md), and [`STUDIONET_STATUS_AND_VERCEL.md`](STUDIONET_STATUS_AND_VERCEL.md).
 
