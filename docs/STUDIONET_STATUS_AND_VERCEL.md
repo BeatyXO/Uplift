@@ -8,7 +8,7 @@ Uplift has **test-only** deployments on GenLayer StudioNet (chain ID `61999`). T
 
 Those successful transfers do **not** test the failure callback. A separate controlled StudioNet probe did produce a finalized internal child execution error, but it credited the receiver and did not invoke the source callback. No callback credit, recovery retry, or post-retry balance delta has been observed for Uplift's external EVM payout path. Public-value funding therefore remains **NO-GO**.
 
-`deployments/studionet.json` remains `NOT_DEPLOYED` by release policy: it is the release manifest, and no deployment is approved for release until failed-child recovery and the remaining release gates pass. This status does not mean no test contract was ever deployed. The addresses above are isolated test contracts and must not be presented as production deployments.
+`deployments/studionet.json` records the deployed fast-window test fixture at `0x2C64F7BF0A156b03B250321CD893E3bb2188308A` and its observed deployment transaction. Its status is `TEST_DEPLOYED_RELEASE_BLOCKED`: the contract is deployed and used, but failed-child recovery remains unverified and public funding is not approved. The fixture's source hash is explicitly identified as `tests/fixtures/UpliftFastTest.py`; it is not the current production contract source.
 
 ## Vercel environment variable
 
